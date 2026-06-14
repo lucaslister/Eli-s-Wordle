@@ -142,7 +142,6 @@
   .pc-br{position:absolute;bottom:3px;right:5px;font-size:.72em;opacity:.8;}
   .so-col.so-valid,.card-slot.so-valid{outline:2px dashed var(--accent);outline-offset:-2px;border-radius:7px;}
   .so-col.so-over,.card-slot.so-over{outline:3px solid var(--accent);outline-offset:-2px;border-radius:7px;background:rgba(47,158,110,.12);}
-  #scr-solitaire.landscape{position:fixed;top:50%;left:50%;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;z-index:60;background:var(--bg);overflow:hidden;}
   .so-top{display:flex;gap:4px;align-items:flex-start;margin-bottom:14px;}
   .so-spacer{flex:1 1 auto;min-width:4px;}
   .card-slot{width:44px;height:62px;flex:0 0 auto;}
@@ -372,7 +371,7 @@ function show(id){curScreen=id;document.querySelectorAll('.screen').forEach(s=>s
   $('hintBtn').style.display=(HINT[id])?'':'none';
   const t=TITLES[id]||"Eli's Games";$('title').innerHTML=(id==='home')?(t+'<span class="dot">.</span>'):t;
   noKb();resetKeys();applySoOrient();if(INIT[id])INIT[id]();}
-function applySoOrient(){const sc=$('scr-solitaire');if(!sc)return;const portrait=window.matchMedia?window.matchMedia('(orientation: portrait)').matches:true;sc.classList.toggle('landscape',curScreen==='solitaire'&&portrait);}
+function applySoOrient(){const sc=$('scr-solitaire');if(sc)sc.classList.remove('landscape');}
 $('backBtn').onclick=()=>show('home');
 $('statsBtn').onclick=()=>show('stats');
 $('hintBtn').onclick=()=>{if(HINT[curScreen])HINT[curScreen]();};
@@ -406,7 +405,7 @@ const INSTR={
  connect:{t:"Connections",b:"Sort the 16 words into <b>4 hidden groups of 4</b>. Select four words then <b>Submit</b>. Four wrong guesses and the game ends. \uD83D\uDCA1 names one group."},
  cross:{t:"Crossword",b:"Fill every square so that each <b>row and column</b> spells a word. Tap a square and type a letter; use the Across and Down clues. <b>Check</b> marks wrong letters grey. \uD83D\uDCA1 fills the selected square."},
  sudoku:{t:"Sudoku",b:"Fill the grid so every <b>row, column and 3\u00d73 box</b> contains 1\u20139 with no repeats. Tap a square, then a number (or \u2326 to clear). Pick <b>Easy / Medium / Hard</b>, and \uD83D\uDCA1 fills the selected square."},
- solitaire:{t:"Solitaire",b:"Klondike patience \u2014 turn your phone <b>sideways</b> to play. Build the four <b>foundations up by suit</b> from Ace to King; on the table, stack <b>down in alternating colours</b>, and only Kings start an empty column.<br><br><b>Tap</b> a card to shoot it straight to a foundation, or <b>drag</b> it (valid spots light up green) to place it anywhere. Tap the deck to draw \u2014 toggle <b>Draw 1/3</b> in the bar. <b>Auto</b> clears everything it can, <b>Undo</b> takes moves back, and a move counter and timer sit up top."},
+ solitaire:{t:"Solitaire",b:"Klondike patience. Build the four <b>foundations up by suit</b> from Ace to King; on the table, stack <b>down in alternating colours</b>, and only Kings start an empty column.<br><br><b>Tap</b> a card to shoot it straight to a foundation, or <b>drag</b> it \u2014 the card follows your finger and valid spots light up green. Tap the deck to draw; toggle <b>Draw 1/3</b> in the bar. <b>Auto</b> clears everything it can, and <b>Undo</b> takes moves back."},
  memory:{t:"Memory",b:"Tap two cards to turn them over. If they <b>match</b>, they stay; if not, they flip back. Find every pair in as <b>few moves</b> as you can. Pick Easy / Medium / Hard, and \uD83D\uDCA1 briefly reveals a matching pair."},
  stats:{t:"Stats",b:"Your scores across all nine games, saved on this device."}
 };
@@ -721,13 +720,16 @@ function soComputeValid(src){soValid=new Set();const cards=soCardsOf(src);if(!ca
   for(let j=0;j<7;j++){if(src.type==='tableau'&&src.col===j)continue;const d=soTab[j];const ok=d.length===0?(first.r===13):(d[d.length-1].up&&d[d.length-1].r===first.r+1&&soRed(d[d.length-1].s)!==soRed(first.s));if(ok)soValid.add('tableau:'+j);}}
 function soMarkValid(on){document.querySelectorAll('#scr-solitaire [data-pile]').forEach(el=>{const key=el.dataset.pile+':'+el.dataset.col;el.classList.toggle('so-valid',!!on&&soValid.has(key));if(!on)el.classList.remove('so-over');});}
 function soPileAt(x,y){let el=document.elementFromPoint(x,y);while(el&&!(el.dataset&&el.dataset.pile))el=el.parentElement;return el;}
-function soStartDrag(e,src){if(e.button!=null&&e.button>0)return;const cards=soCardsOf(src);if(!cards||!cards.length||!cards[0].up)return;soDrag={src,sx:e.clientX,sy:e.clientY,moved:false};}
+function soStartDrag(e,src){if(e.button!=null&&e.button>0)return;const cards=soCardsOf(src);if(!cards||!cards.length||!cards[0].up)return;const el=e.currentTarget;const r=el&&el.getBoundingClientRect?el.getBoundingClientRect():{left:e.clientX-20,top:e.clientY-28,width:44};soDrag={src,cards,sx:e.clientX,sy:e.clientY,ox:e.clientX-r.left,oy:e.clientY-r.top,w:r.width,moved:false,ghost:null};}
+function soGhost(){const g=document.createElement('div');g.style.position='fixed';g.style.left='-999px';g.style.top='-999px';g.style.width=soDrag.w+'px';g.style.zIndex='300';g.style.pointerEvents='none';g.style.filter='drop-shadow(0 6px 10px rgba(0,0,0,.3))';
+  soDrag.cards.forEach((c,i)=>{const cc=soCardEl(c,{});cc.style.position='relative';cc.style.marginTop=i?'-44px':'0';cc.style.width='100%';g.appendChild(cc);});document.body.appendChild(g);soDrag.ghost=g;}
 if(typeof window!=='undefined'&&window.PointerEvent){
-  document.addEventListener('pointermove',e=>{if(!soDrag)return;if(!soDrag.moved){if(Math.hypot(e.clientX-soDrag.sx,e.clientY-soDrag.sy)<8)return;soDrag.moved=true;soComputeValid(soDrag.src);soMarkValid(true);}
-    document.querySelectorAll('#scr-solitaire .so-over').forEach(x=>x.classList.remove('so-over'));const el=soPileAt(e.clientX,e.clientY);if(el){const key=el.dataset.pile+':'+el.dataset.col;if(soValid.has(key))el.classList.add('so-over');}e.preventDefault();},{passive:false});
-  document.addEventListener('pointerup',e=>{if(!soDrag)return;const d=soDrag;soDrag=null;soMarkValid(false);if(curScreen!=='solitaire')return;
+  document.addEventListener('pointermove',e=>{if(!soDrag)return;if(!soDrag.moved){if(Math.hypot(e.clientX-soDrag.sx,e.clientY-soDrag.sy)<7)return;soDrag.moved=true;soComputeValid(soDrag.src);soMarkValid(true);soGhost();}
+    if(soDrag.ghost){soDrag.ghost.style.left=(e.clientX-soDrag.ox)+'px';soDrag.ghost.style.top=(e.clientY-soDrag.oy)+'px';}
+    document.querySelectorAll('#scr-solitaire .so-over').forEach(x=>x.classList.remove('so-over'));const pe=soPileAt(e.clientX,e.clientY);if(pe){const key=pe.dataset.pile+':'+pe.dataset.col;if(soValid.has(key))pe.classList.add('so-over');}e.preventDefault();},{passive:false});
+  document.addEventListener('pointerup',e=>{if(!soDrag)return;const d=soDrag;soDrag=null;if(d.ghost)d.ghost.remove();soMarkValid(false);if(curScreen!=='solitaire')return;
     if(!d.moved){soTap(d.src);return;}
-    const el=soPileAt(e.clientX,e.clientY);if(el){soSel=d.src;if(!soMoveTo({type:el.dataset.pile,col:+el.dataset.col})){soSel=null;soRender();}}else{soSel=null;soRender();}});
+    const pe=soPileAt(e.clientX,e.clientY);if(pe){soSel=d.src;if(!soMoveTo({type:pe.dataset.pile,col:+pe.dataset.col})){soSel=null;soRender();}}else{soSel=null;soRender();}});
 }
 function soRender(){const PE=typeof window!=='undefined'&&window.PointerEvent;
   const stk=$('soStock');stk.innerHTML='';stk.onclick=soDraw;stk.appendChild(soStock.length?soCardEl({up:false},{count:soStock.length}):soCardEl(null,{sym:'\u21BB'}));
