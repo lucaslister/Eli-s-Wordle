@@ -3,97 +3,106 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#12161b" />
+<meta name="theme-color" content="#f7f8fa" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Eli's Games" />
 <link rel="apple-touch-icon" href="icon-180.png" />
 <link rel="manifest" href="manifest.webmanifest" />
 <title>Eli's Games</title>
 <style>
-  :root{--bg:#12161b;--panel:#171c22;--ink:#eef2f4;--muted:#8a96a0;--line:#2a323b;--te:#1c222a;--tb:#39424d;
-    --correct:#3aa675;--present:#d6a23a;--absent:#2b333c;--key:#3a444f;--accent:#3aa675;--tf:1.6rem;font-size:16px;}
+  :root{
+    --bg:#f3f5f7;--panel:#ffffff;--ink:#1b1f24;--muted:#69727c;--line:#dde2e7;
+    --te:#ffffff;--tb:#c2c9d0;
+    --correct:#4ea268;--present:#e0ab3f;--absent:#9aa1a9;--key:#e7eaee;--accent:#2f9e6e;
+    --tf:1.6rem;--shadow:0 1px 2px rgba(20,30,40,.06),0 2px 8px rgba(20,30,40,.05);font-size:16px;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;margin:0;}
   body{background:var(--bg);color:var(--ink);font-family:"Roboto",ui-sans-serif,system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
     display:flex;flex-direction:column;height:100dvh;overflow:hidden;user-select:none;-webkit-user-select:none;overscroll-behavior:none;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
-  header{flex:0 0 auto;border-bottom:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;gap:10px;}
+  header{flex:0 0 auto;border-bottom:1px solid var(--line);padding:10px 12px;display:flex;align-items:center;gap:8px;background:var(--panel);}
   #backBtn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 12px;font-size:1rem;cursor:pointer;}
-  #title{font-size:1.1rem;font-weight:800;flex:1;}
+  #title{font-size:1.1rem;font-weight:800;flex:1;color:var(--ink);}
   #title .dot{color:var(--accent);}
-  .hbtn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 11px;font-size:.78rem;font-weight:600;cursor:pointer;}
+  .hbtn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 11px;font-size:.92rem;font-weight:600;cursor:pointer;line-height:1;}
   .wrap{flex:1 1 auto;min-height:0;overflow:auto;}
   .screen{display:none;flex-direction:column;height:100%;}
   .screen.on{display:flex;}
 
-  /* home */
   #scr-home{padding:14px;}
   .cards{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 12px;cursor:pointer;text-align:left;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 12px;cursor:pointer;text-align:left;color:var(--ink);box-shadow:var(--shadow);}
   .card:active{border-color:var(--accent);}
   .card .emoji{font-size:1.7rem;}
-  .card h3{margin:8px 0 3px;font-size:1rem;}
+  .card h3{margin:8px 0 3px;font-size:1rem;color:var(--ink);}
   .card p{margin:0;font-size:.72rem;color:var(--muted);line-height:1.3;}
   .home-h{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:2px 2px 12px;}
 
   main.play{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:8px 10px;}
-  .sub{font-size:.74rem;color:var(--muted);text-align:center;}
+  .sub{font-size:.78rem;color:var(--muted);text-align:center;}
   .barrow{display:flex;gap:6px;padding:8px 12px 0;align-items:center;width:100%;max-width:520px;margin:0 auto;}
-  .seg{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px;font-size:.8rem;font-weight:700;cursor:pointer;}
-  .seg.active{border-color:var(--accent);background:rgba(58,166,117,.15);color:var(--ink);}
-  .minibtn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:.76rem;font-weight:700;cursor:pointer;}
+  .seg{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px;font-size:.8rem;font-weight:700;cursor:pointer;}
+  .seg.active{border-color:var(--accent);background:rgba(47,158,110,.12);color:var(--ink);}
+  .minibtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:.76rem;font-weight:700;cursor:pointer;}
   #lenbar{display:none;gap:5px;padding:8px 12px 0;width:100%;max-width:520px;margin:0 auto;}
   #lenbar.show{display:flex;}
-  .lenbtn{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:7px;padding:7px 0;font-size:.8rem;font-weight:700;cursor:pointer;}
-  .lenbtn.active{border-color:var(--accent);background:rgba(58,166,117,.15);color:var(--ink);}
+  .lenbtn{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:7px;padding:7px 0;font-size:.8rem;font-weight:700;cursor:pointer;}
+  .lenbtn.active{border-color:var(--accent);background:rgba(47,158,110,.12);color:var(--ink);}
 
   .grid{display:grid;gap:5px;}
-  .tile{display:flex;align-items:center;justify-content:center;border:2px solid var(--tb);background:var(--te);border-radius:7px;font-size:var(--tf);font-weight:700;text-transform:uppercase;}
+  .tile{display:flex;align-items:center;justify-content:center;border:2px solid var(--tb);background:var(--te);border-radius:7px;font-size:var(--tf);font-weight:700;text-transform:uppercase;color:var(--ink);}
   .tile.correct{background:var(--correct);border-color:var(--correct);color:#fff;}
-  .tile.present{background:var(--present);border-color:var(--present);color:#1a1409;}
-  .tile.absent{background:var(--absent);border-color:var(--absent);color:#cdd4da;}
-  .tile.filled{border-color:#5a6672;}
-  .tile.hint{box-shadow:inset 0 0 0 2px rgba(58,166,117,.5);border-color:var(--accent);}
+  .tile.present{background:var(--present);border-color:var(--present);color:#fff;}
+  .tile.absent{background:var(--absent);border-color:var(--absent);color:#fff;}
+  .tile.filled{border-color:#8b939c;}
+  .tile.hint{box-shadow:inset 0 0 0 2px rgba(47,158,110,.55);border-color:var(--accent);}
   @keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
   .shake{animation:shake .4s;}
 
-  #kbWrap{flex:0 0 auto;padding:8px 6px max(8px,env(safe-area-inset-bottom)) 6px;display:none;flex-direction:column;gap:7px;width:100%;max-width:520px;margin:0 auto;}
+  #kbWrap{flex:0 0 auto;padding:8px 6px max(8px,env(safe-area-inset-bottom)) 6px;display:none;flex-direction:column;gap:7px;width:100%;max-width:520px;margin:0 auto;background:var(--bg);}
   .krow{display:flex;justify-content:center;gap:5px;}
   .key{flex:1 1 0;min-width:0;height:48px;background:var(--key);color:var(--ink);border:none;border-radius:7px;font-size:.92rem;font-weight:700;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;}
   .key.wide{flex:1.5 1 0;font-size:.66rem;}
-  .key.correct{background:var(--correct);color:#fff;}.key.present{background:var(--present);color:#1a1409;}.key.absent{background:var(--absent);color:#7d8893;}
+  .key.correct{background:var(--correct);color:#fff;}.key.present{background:var(--present);color:#fff;}.key.absent{background:var(--absent);color:#fff;}
 
   .hintbar{display:flex;gap:10px;align-items:center;justify-content:space-between;width:min(92vw,360px);min-height:32px;}
   .chips{display:flex;gap:6px;flex-wrap:wrap;font-size:.72rem;color:var(--muted);}
   .chip{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px;}
   .chip b{color:var(--accent);}
 
-  /* letter button rows (honeycomb/anagram) */
+  /* honeycomb */
+  .hive{position:relative;width:252px;height:240px;margin:6px auto;}
+  .hex{position:absolute;width:84px;height:96px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+    background:var(--key);border:none;color:var(--ink);font-size:1.55rem;font-weight:800;text-transform:uppercase;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .hex.center{background:var(--present);color:#fff;}
+  .hex:active{filter:brightness(.93);}
+
   .letpad{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:340px;}
   .let{width:48px;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.2rem;font-weight:800;text-transform:uppercase;cursor:pointer;}
-  .let.center{background:var(--present);color:#1a1409;border-color:var(--present);}
-  .let.used{opacity:.35;}
-  .built{font-size:1.6rem;font-weight:800;letter-spacing:.12em;min-height:30px;text-transform:uppercase;}
-  .foundbox{width:min(92vw,360px);max-height:22vh;overflow:auto;font-size:.82rem;color:var(--muted);text-align:left;border:1px solid var(--line);border-radius:8px;padding:8px;}
+  .let.used{opacity:.32;}
+  .built{font-size:1.6rem;font-weight:800;letter-spacing:.12em;min-height:30px;text-transform:uppercase;color:var(--ink);}
+  .foundbox{width:min(92vw,360px);max-height:22vh;overflow:auto;font-size:.82rem;color:var(--muted);text-align:left;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--panel);}
   .foundbox span{display:inline-block;margin:2px 6px 2px 0;}
 
-  .toast{position:fixed;top:120px;left:50%;transform:translateX(-50%);background:var(--ink);color:#12161b;font-weight:600;font-size:.85rem;padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:80;white-space:nowrap;}
+  .toast{position:fixed;top:120px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:600;font-size:.85rem;padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:80;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;}
   .toast.show{opacity:1;}
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden;}
   #confetti i{position:absolute;top:-14px;width:9px;height:15px;border-radius:2px;animation:fall 1.9s linear forwards;}
   @keyframes fall{to{transform:translateY(112vh) rotate(560deg);}}
 
-  .overlay{position:fixed;inset:0;background:rgba(8,11,14,.74);display:none;align-items:center;justify-content:center;z-index:70;padding:22px;backdrop-filter:blur(3px);}
+  .overlay{position:fixed;inset:0;background:rgba(22,28,34,.42);display:none;align-items:center;justify-content:center;z-index:70;padding:22px;backdrop-filter:blur(2px);}
   .overlay.show{display:flex;}
-  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(92vw,380px);text-align:center;max-height:90dvh;overflow:auto;}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(92vw,380px);text-align:center;max-height:90dvh;overflow:auto;box-shadow:0 12px 40px rgba(20,30,40,.18);}
   .modal h2{margin:0 0 6px;font-size:1.3rem;}
   .modal p{margin:0 0 14px;color:var(--muted);font-size:.95rem;}
   .modal p b{color:var(--accent);}
-  .eliphoto{display:none;width:100%;max-height:40vh;object-fit:contain;border-radius:12px;margin:0 0 14px;background:#0d1116;}
+  .modal .left{text-align:left;line-height:1.5;color:var(--ink);}
+  .eliphoto{display:none;width:100%;max-height:40vh;object-fit:contain;border-radius:12px;margin:0 0 14px;background:#eef1f4;}
   .btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;}
-  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}
+  .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--ink);}
   .stat4{display:flex;justify-content:space-around;margin:6px 0 16px;}
   .stat4 .n{font-size:1.6rem;font-weight:800;}.stat4 .l{font-size:.56rem;color:var(--muted);text-transform:uppercase;}
   .distrow{display:flex;align-items:center;gap:8px;margin-bottom:4px;}.distlbl{width:12px;font-weight:700;color:var(--muted);}
@@ -103,6 +112,14 @@
   .clues h4{margin:8px 0 4px;font-size:.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;}
   .clues div{color:var(--ink);margin:2px 0;}
   .lives{font-size:1rem;letter-spacing:.15em;}
+
+  /* stats screen */
+  #scr-stats{padding:14px;overflow:auto;}
+  .scard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;box-shadow:var(--shadow);}
+  .scard h3{margin:0 0 8px;font-size:.95rem;display:flex;align-items:center;gap:8px;}
+  .smetrics{display:flex;gap:16px;flex-wrap:wrap;}
+  .smetrics div{font-size:.74rem;color:var(--muted);}
+  .smetrics b{display:block;font-size:1.25rem;color:var(--ink);font-weight:800;}
   @media (prefers-reduced-motion: reduce){#confetti{display:none!important;}.shake{animation:none!important;}}
 </style>
 </head>
@@ -110,7 +127,9 @@
   <header>
     <button id="backBtn">&larr;</button>
     <div id="title">Eli's Games<span class="dot">.</span></div>
-    <button class="hbtn" id="helpBtn">?</button>
+    <button class="hbtn" id="statsBtn" title="Stats">&#128202;</button>
+    <button class="hbtn" id="hintBtn" title="Hint">&#128161;</button>
+    <button class="hbtn" id="helpBtn" title="How to play">?</button>
   </header>
   <div class="wrap">
 
@@ -118,6 +137,8 @@
       <p class="home-h">Pick a game</p>
       <div class="cards" id="cards"></div>
     </div>
+
+    <div class="screen" id="scr-stats"></div>
 
     <div class="screen" id="scr-wordle">
       <div class="barrow"><button class="seg active" data-wm="daily">Daily</button><button class="seg" data-wm="practice">Practice</button><button class="minibtn" id="wCtx">Levels</button></div>
@@ -127,8 +148,9 @@
     </div>
 
     <div class="screen" id="scr-honey">
-      <main class="play"><div class="sub" id="hySub"></div><div class="built" id="hyBuilt"></div>
-        <div class="letpad" id="hyPad"></div>
+      <main class="play"><div class="sub" id="hySub"></div>
+        <div class="hive" id="hyHive"></div>
+        <div class="built" id="hyBuilt"></div>
         <div class="barrow" style="max-width:340px"><button class="minibtn" id="hyDel" style="flex:1">Delete</button><button class="minibtn" id="hyShuf" style="flex:1">Shuffle</button><button class="seg active" id="hyEnter" style="flex:1.4">Enter</button></div>
         <div class="foundbox" id="hyFound"></div></main>
     </div>
@@ -197,8 +219,8 @@
   </div></div>
 
   <div class="overlay" id="helpModal"><div class="modal">
-    <h2>Eli's Games</h2>
-    <p style="text-align:left;line-height:1.5">Nine word games. <b>Daily Wordle</b> is the shared puzzle everyone races. The rest are unlimited fun &mdash; tap a card to play. Every win shows a photo of baby Eli!</p>
+    <h2 id="helpTitle">How to play</h2>
+    <div class="left" id="helpBody"></div>
     <button class="btn" id="helpClose">Got it</button>
   </div></div>
 
@@ -234,11 +256,13 @@ store.stats=Object.assign({played:0,wins:0,cur:0,max:0,dist:[0,0,0,0,0],lastWonD
 if(!Array.isArray(store.stats.dist)||store.stats.dist.length!==5)store.stats.dist=[0,0,0,0,0];
 store.daily=Object.assign({day:null,guesses:[],done:false,won:false},store.daily||{});
 store.practice=Object.assign({len:5,levels:{}},store.practice||{});
+store.gs=Object.assign({honey:{score:0,words:0},ladder:{solved:0,best:0},boggle:{score:0,words:0,plays:0},anagram:{best:0},search:{done:0},hangman:{w:0,l:0,streak:0,best:0},connect:{solved:0,plays:0},cross:{solved:0}},store.gs||{});
 if(store.winCount==null)store.winCount=0;
 const save=()=>STORE.set(store);
+const gs=store.gs;
 
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1400);}
-function confetti(){if(rm())return;const c=$('confetti');c.innerHTML='';const cols=['#3aa675','#d6a23a','#5aa9e6','#e7657b','#f4d35e','#fff'];
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1600);}
+function confetti(){if(rm())return;const c=$('confetti');c.innerHTML='';const cols=['#2f9e6e','#e0ab3f','#5aa9e6','#e7657b','#f4d35e','#7bce9a'];
   for(let i=0;i<28;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'%';p.style.background=cols[i%6];p.style.animationDelay=(Math.random()*0.5).toFixed(2)+'s';c.appendChild(p);}
   setTimeout(()=>c.innerHTML='',2600);}
 function nextPhoto(){const i=(store.winCount||0)%PHOTOS.length;store.winCount=(store.winCount||0)+1;save();return PHOTOS[i];}
@@ -261,14 +285,19 @@ document.addEventListener('keydown',e=>{if(document.querySelector('.overlay.show
   if(e.key==='Enter')KB('enter');else if(e.key==='Backspace')KB('back');else{const k=e.key.toLowerCase();if(/^[a-z]$/.test(k))KB(k);}});
 
 /* router */
-const TITLES={home:"Eli's Games",wordle:"Wordle",honey:"Spelling Bee",ladder:"Word Ladder",boggle:"Boggle",anagram:"Anagram",search:"Word Search",hangman:"Hangman",connect:"Connections",cross:"Crossword"};
-const INIT={wordle:initWordle,honey:initHoney,ladder:initLadder,boggle:initBoggle,anagram:initAnagram,search:initSearch,hangman:initHangman,connect:initConnect,cross:initCross};
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$('scr-'+id).classList.add('on');
+let curScreen='home';
+const TITLES={home:"Eli's Games",stats:"Stats",wordle:"Wordle",honey:"Spelling Bee",ladder:"Word Ladder",boggle:"Boggle",anagram:"Anagram",search:"Word Search",hangman:"Hangman",connect:"Connections",cross:"Crossword"};
+const INIT={stats:renderStats,wordle:initWordle,honey:initHoney,ladder:initLadder,boggle:initBoggle,anagram:initAnagram,search:initSearch,hangman:initHangman,connect:initConnect,cross:initCross};
+function show(id){curScreen=id;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$('scr-'+id).classList.add('on');
   $('backBtn').style.visibility=id==='home'?'hidden':'visible';
+  $('statsBtn').style.display=id==='home'?'':'none';
+  $('hintBtn').style.display=(HINT[id])?'':'none';
   const t=TITLES[id]||"Eli's Games";$('title').innerHTML=(id==='home')?(t+'<span class="dot">.</span>'):t;
   noKb();resetKeys();if(INIT[id])INIT[id]();}
 $('backBtn').onclick=()=>show('home');
-$('helpBtn').onclick=()=>$('helpModal').classList.add('show');
+$('statsBtn').onclick=()=>show('stats');
+$('hintBtn').onclick=()=>{if(HINT[curScreen])HINT[curScreen]();};
+$('helpBtn').onclick=()=>{const i=INSTR[curScreen]||INSTR.home;$('helpTitle').textContent=i.t;$('helpBody').innerHTML=i.b;$('helpModal').classList.add('show');};
 $('helpClose').onclick=()=>$('helpModal').classList.remove('show');
 
 const GAMES=[["wordle","\uD83D\uDFE9","Wordle","Daily 5-letter + practice 3\u20138"],
@@ -283,10 +312,40 @@ const GAMES=[["wordle","\uD83D\uDFE9","Wordle","Daily 5-letter + practice 3\u201
 (function(){const c=$('cards');GAMES.forEach(g=>{const d=document.createElement('button');d.className='card';
   d.innerHTML='<div class="emoji">'+g[1]+'</div><h3>'+g[2]+'</h3><p>'+g[3]+'</p>';d.onclick=()=>show(g[0]);c.appendChild(d);});})();
 
-/* ============ helpers for boards ============ */
+const INSTR={
+ home:{t:"Eli's Games",b:"<p>Nine word games. <b>Daily Wordle</b> is the shared puzzle everyone races; the rest are unlimited. Tap <b>\uD83D\uDCA1</b> in a game for a hint, and <b>\uD83D\uDCCA</b> on this screen for your scores.</p><p>Every win shows a photo of baby Eli \uD83D\uDC99</p>"},
+ wordle:{t:"Wordle",b:"Guess the hidden word. <b>Green</b> = right letter, right spot; <b>amber</b> = right letter, wrong spot; <b>grey</b> = not in the word. <br><br><b>Daily</b> is one shared 5-letter puzzle a day. <b>Practice</b> lets you pick word length (3\u20138) and play endless levels. Tap <b>Hint</b> to reveal a letter."},
+ honey:{t:"Spelling Bee",b:"Make as many words as you can (4+ letters) using the seven letters. Every word must include the <b>centre</b> (amber) letter, and letters can repeat. <br><br>Using all seven letters is a <b>Pangram</b> (+7 points). Your rank climbs from Start to <b>Genius</b>."},
+ ladder:{t:"Word Ladder",b:"Turn the start word into the target by changing <b>one letter at a time</b>. Every rung must be a real word. Try to match the <b>par</b> (fewest steps). \uD83D\uDCA1 reveals a good next word."},
+ boggle:{t:"Boggle",b:"Tap <b>touching</b> letters (including diagonals) to spell a word of 3+ letters, then <b>Enter</b>. Longer words score more. Find as many as you can before the timer runs out!"},
+ anagram:{t:"Anagram",b:"Make as many words as you can (3\u20136 letters) from the scrambled letters. Tap letters to build a word, then <b>Enter</b>. Find them all to win!"},
+ search:{t:"Word Search",b:"Find every hidden word from the list. <b>Tap the first letter, then the last letter</b> of a word \u2014 words run horizontally, vertically or diagonally, forwards or backwards."},
+ hangman:{t:"Hangman",b:"Guess the hidden word one letter at a time using the keyboard. You can make <b>6 wrong guesses</b> before it's game over. \uD83D\uDCA1 reveals a letter."},
+ connect:{t:"Connections",b:"Sort the 16 words into <b>4 hidden groups of 4</b>. Select four words then <b>Submit</b>. Four wrong guesses and the game ends. \uD83D\uDCA1 names one group."},
+ cross:{t:"Crossword",b:"Fill every square so that each <b>row and column</b> spells a word. Tap a square and type a letter; use the Across and Down clues. <b>Check</b> marks wrong letters grey. \uD83D\uDCA1 fills the selected square."},
+ stats:{t:"Stats",b:"Your scores across all nine games, saved on this device."}
+};
+
+/* stats screen */
+function renderStats(){const s=store.stats,g=gs;const wpct=s.played?Math.round(s.wins/s.played*100):0;
+  const hmTot=g.hangman.w+g.hangman.l,hmpct=hmTot?Math.round(g.hangman.w/hmTot*100):0;
+  function card(emoji,name,metrics){return '<div class="scard"><h3>'+emoji+' '+name+'</h3><div class="smetrics">'+metrics.map(m=>'<div><b>'+m[1]+'</b>'+m[0]+'</div>').join('')+'</div></div>';}
+  $('scr-stats').innerHTML=
+   card('\uD83D\uDFE9','Wordle (Daily)',[['Played',s.played],['Win %',wpct],['Streak',s.cur],['Best streak',s.max]])+
+   card('\uD83D\uDC1D','Spelling Bee',[['Best score',g.honey.score],['Most words',g.honey.words]])+
+   card('\uD83E\uDE9C','Word Ladder',[['Solved',g.ladder.solved],['At/under par',g.ladder.best]])+
+   card('\uD83C\uDFB2','Boggle',[['Best score',g.boggle.score],['Most words',g.boggle.words],['Rounds',g.boggle.plays]])+
+   card('\uD83D\uDD00','Anagram',[['Most found',g.anagram.best]])+
+   card('\uD83D\uDD0D','Word Search',[['Completed',g.search.done]])+
+   card('\uD83C\uDFAF','Hangman',[['Wins',g.hangman.w],['Win %',hmpct],['Streak',g.hangman.streak],['Best',g.hangman.best]])+
+   card('\uD83E\uDDE9','Connections',[['Solved',g.connect.solved],['Played',g.connect.plays]])+
+   card('\u270F\uFE0F','Crossword',[['Solved',g.cross.solved]]);
+}
+
 function gridSide(){return Math.floor(Math.min(window.innerWidth*0.9,window.innerHeight*0.5,460));}
 function setGrid(el,cols,rows,side){el.style.width=side+'px';el.style.height=(side*rows/cols)+'px';
   el.style.gridTemplateColumns='repeat('+cols+',1fr)';el.style.gridTemplateRows='repeat('+rows+',1fr)';}
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=rint(i+1);const t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 /* ===================== WORDLE ===================== */
 let wMode='daily',LEN=5,wLevel=1,wAns='',wRow=0,wCol=0,wCur='',wOver=false,wLock=false,wRestore=false;
@@ -337,18 +396,18 @@ function wBad(m){toast(m);const bd=$('wBoard');bd.classList.remove('shake');void
 function wRenderHints(){const cw=$('wChips');cw.innerHTML='';if(wMode==='daily'&&store.daily.done){$('wHint').style.display='none';const c=document.createElement('span');c.className='chip';c.style.color='var(--accent)';c.textContent='Completed today \u2713';cw.appendChild(c);return;}
   $('wHint').style.display='';wHinted.slice().sort((a,b)=>a-b).forEach(p=>{const c=document.createElement('span');c.className='chip';c.innerHTML='#'+(p+1)+' = <b>'+wAns[p].toUpperCase()+'</b>';cw.appendChild(c);});
   $('wHint').textContent='Hint \u00b7 '+(wHMAX-wHints);$('wHint').disabled=wOver||wLock||wHints>=wHMAX;}
-$('wHint').onclick=()=>{if(wOver||wLock||wHints>=wHMAX)return;const c=[];for(let i=0;i<LEN;i++)if(!wSolved.has(i)&&!wHinted.includes(i))c.push(i);if(!c.length){toast('Nothing to hint');return;}const p=c[rint(c.length)];wHinted.push(p);wHints++;const t=wGrid[wRow]&&wGrid[wRow][p];if(t&&!t.classList.contains('correct')&&!t.classList.contains('present')&&!t.classList.contains('absent'))t.classList.add('hint');toast('Letter '+(p+1)+' is '+wAns[p].toUpperCase());wRenderHints();};
+function wDoHint(){if(wOver||wLock||wHints>=wHMAX){toast('No hints left');return;}const c=[];for(let i=0;i<LEN;i++)if(!wSolved.has(i)&&!wHinted.includes(i))c.push(i);if(!c.length){toast('Nothing to hint');return;}const p=c[rint(c.length)];wHinted.push(p);wHints++;const t=wGrid[wRow]&&wGrid[wRow][p];if(t&&!t.classList.contains('correct')&&!t.classList.contains('present')&&!t.classList.contains('absent'))t.classList.add('hint');toast('Letter '+(p+1)+' is '+wAns[p].toUpperCase());wRenderHints();}
+$('wHint').onclick=wDoHint;
 function openWStats(isR,won,g){const s=store.stats;const ip=$('wPhoto');if(isR&&won){ip.src=nextPhoto();ip.style.display='block';}else{ip.style.display='none';ip.removeAttribute('src');}
   $('sP').textContent=s.played;$('sW').textContent=s.played?Math.round(s.wins/s.played*100):0;$('sC').textContent=s.cur;$('sB').textContent=s.max;
   const mx=Math.max(1,...s.dist),d=$('dist');d.innerHTML='';for(let i=0;i<5;i++){const r=document.createElement('div');r.className='distrow';r.innerHTML='<span class="distlbl">'+(i+1)+'</span><span class="distbar'+((isR&&won&&g===i+1)?' hi':'')+'" style="width:'+Math.max(8,s.dist[i]/mx*100)+'%">'+s.dist[i]+'</span>';d.appendChild(r);}
   if(isR){$('wsTitle').textContent=won?'Well done! \uD83C\uDF89':'Out of guesses';$('wsSub').innerHTML=won?('Solved in '+g+' \u2014 baby <b>Eli</b> says hi \uD83D\uDC99'):('The word was <b>'+dailyAns.toUpperCase()+'</b>');}else{$('wsTitle').textContent='Statistics';$('wsSub').textContent='';}
   $('wShare').style.display=(store.daily.day===dayIdx&&store.daily.done)?'':'none';$('wStats').classList.add('show');}
 $('wsClose').onclick=()=>$('wStats').classList.remove('show');
-function shareDaily(){const n=store.daily.won?store.daily.guesses.length:'X';const grid=(store.daily.guesses||[]).map(w=>evalA(w,dailyAns).map(s=>s==='correct'?'\uD83D\uDFE9':s==='present'?'\uD83D\uDFE8':'\u2B1B').join('')).join('\n');
+function shareDaily(){const n=store.daily.won?store.daily.guesses.length:'X';const grid=(store.daily.guesses||[]).map(w=>evalA(w,dailyAns).map(s=>s==='correct'?'\uD83D\uDFE9':s==='present'?'\uD83D\uDFE8':'\u2B1C').join('')).join('\n');
   const text="Eli's Wordle #"+puzzleNo+'  '+n+'/5\n'+grid;
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>toast('Result copied!')).catch(()=>toast('Copy failed'));else toast('Copy not supported');}
 $('wShare').onclick=shareDaily;
-/* level overlay */
 let pick=1,lvFor=5;
 $('lvInput').oninput=()=>{pick=parseInt($('lvInput').value,10)||1;lvSync(false);};
 $('lvRange').oninput=()=>{pick=parseInt($('lvRange').value,10);lvSync(true);};
@@ -358,46 +417,53 @@ $('lvPlay').onclick=()=>{$('lvOverlay').classList.remove('show');startPractice(l
 $('lvClose').onclick=()=>$('lvOverlay').classList.remove('show');
 
 /* ===================== SPELLING BEE ===================== */
-let hyLetters=[],hyCenter='',hyBuilt='',hyFound=[],hyMax=0,hyValid=new Set();
+let hyLetters=[],hyCenter='',hyBuilt='',hyFound=[],hyMax=0,hyValid=new Set(),hyOrder=[];
+const HIVEPOS=[[84,72],[42,0],[126,0],[0,72],[168,72],[42,144],[126,144]];
 function initHoney(){const set=HONEY[(dayIndex()+(store.hyN||0))%HONEY.length];const seven=set.slice(0,7).split('');hyCenter=set[7];
   hyLetters=seven;hyBuilt='';hyFound=[];hyValid=new Set();
   for(const w of DICTBIG){if(w.length>=4&&w.includes(hyCenter)){let ok=true;for(const ch of w)if(!seven.includes(ch)){ok=false;break;}if(ok)hyValid.add(w);}}
   hyMax=0;hyValid.forEach(w=>hyMax+=hyScore(w));
-  $('hySub').textContent='Make 4+ letter words using the centre letter. Pangram = all 7!';
-  drawHoney();noKb();updHoney();}
+  hyOrder=hyLetters.filter(l=>l!==hyCenter);shuffleArr(hyOrder);
+  $('hySub').textContent='Make 4+ letter words using the centre letter.';noKb();drawHoney();updHoney();}
 function hyScore(w){let s=w.length<=4?1:w.length;if(new Set(w).size===7)s+=7;return s;}
-function drawHoney(){const p=$('hyPad');p.innerHTML='';const order=[hyCenter].concat(hyLetters.filter(l=>l!==hyCenter));
-  shuffleArr(order);order.forEach(l=>{const b=document.createElement('button');b.className='let'+(l===hyCenter?' center':'');b.textContent=l;b.onclick=()=>{hyBuilt+=l;updHoney();};p.appendChild(b);});}
-function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=rint(i+1);const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function drawHoney(){const h=$('hyHive');h.innerHTML='';const order=[hyCenter].concat(hyOrder);
+  order.forEach((l,i)=>{const b=document.createElement('button');b.className='hex'+(i===0?' center':'');b.style.left=HIVEPOS[i][0]+'px';b.style.top=HIVEPOS[i][1]+'px';b.textContent=l;b.onclick=()=>{hyBuilt+=l;updHoney();};h.appendChild(b);});}
 function updHoney(){$('hyBuilt').textContent=hyBuilt;
   let score=hyFound.reduce((s,w)=>s+hyScore(w),0);const pct=hyMax?Math.round(score/hyMax*100):0;
   let rank=pct>=70?'Genius':pct>=50?'Amazing':pct>=40?'Great':pct>=25?'Good':pct>=15?'Solid':pct>=5?'Nice':'Start';
   $('hyFound').innerHTML='<b>'+rank+'</b> \u00b7 '+hyFound.length+' words \u00b7 '+score+' pts<br>'+hyFound.map(w=>'<span>'+w+'</span>').join('');}
 $('hyDel').onclick=()=>{hyBuilt=hyBuilt.slice(0,-1);updHoney();};
-$('hyShuf').onclick=()=>drawHoney();
-$('hyEnter').onclick=()=>{const w=hyBuilt;hyBuilt='';if(w.length<4){toast('Too short');updHoney();return;}if(!w.includes(hyCenter)){toast('Missing centre letter');updHoney();return;}if(hyFound.includes(w)){toast('Already found');updHoney();return;}if(!hyValid.has(w)){toast('Not in word list');updHoney();return;}hyFound.push(w);if(new Set(w).size===7){toast('PANGRAM! \uD83C\uDF89');confetti();}else toast('+'+hyScore(w));updHoney();};
+$('hyShuf').onclick=()=>{shuffleArr(hyOrder);drawHoney();};
+$('hyEnter').onclick=()=>{const w=hyBuilt;hyBuilt='';if(w.length<4){toast('Too short');updHoney();return;}if(!w.includes(hyCenter)){toast('Missing centre letter');updHoney();return;}if(hyFound.includes(w)){toast('Already found');updHoney();return;}if(!hyValid.has(w)){toast('Not in word list');updHoney();return;}hyFound.push(w);
+  const score=hyFound.reduce((s,x)=>s+hyScore(x),0);if(score>gs.honey.score)gs.honey.score=score;if(hyFound.length>gs.honey.words)gs.honey.words=hyFound.length;save();
+  if(new Set(w).size===7){toast('PANGRAM! \uD83C\uDF89');confetti();}else toast('+'+hyScore(w));updHoney();};
 
 /* ===================== WORD LADDER ===================== */
-let ldStart='',ldEnd='',ldPar=0,ldChain=[],ldCur='',ldLen=4;
-function initLadder(){const e=LADDER[(dayIndex()+(store.ldN||0))%LADDER.length].split(' ');ldStart=e[0];ldEnd=e[1];ldPar=+e[2];ldLen=ldStart.length;ldChain=[ldStart];ldCur='';
-  $('ldSub').textContent='Turn '+ldStart.toUpperCase()+' into '+ldEnd.toUpperCase()+' \u2014 change one letter at a time (par '+ldPar+').';
+let ldStart='',ldEnd='',ldPar=0,ldChain=[],ldCur='',ldLen=4,ldAdj=null;
+function buildAdj(L){const pool=new Set(DICTBIG.filter(w=>w.length===L));const adj={};const al='abcdefghijklmnopqrstuvwxyz';
+  pool.forEach(w=>{adj[w]=[];for(let i=0;i<L;i++)for(const c of al)if(c!==w[i]){const nw=w.slice(0,i)+c+w.slice(i+1);if(pool.has(nw))adj[w].push(nw);}});return adj;}
+function ldNext(){if(!ldAdj)ldAdj=buildAdj(ldLen);const start=ldChain[ldChain.length-1];if(start===ldEnd)return null;
+  const par={},q=[start];par[start]=null;while(q.length){const c=q.shift();if(c===ldEnd)break;for(const nx of(ldAdj[c]||[]))if(!(nx in par)){par[nx]=c;q.push(nx);}}
+  if(!(ldEnd in par))return null;let cur=ldEnd;while(par[cur]!==start&&par[cur]!=null)cur=par[cur];return cur;}
+function initLadder(){const e=LADDER[(dayIndex()+(store.ldN||0))%LADDER.length].split(' ');ldStart=e[0];ldEnd=e[1];ldPar=+e[2];ldLen=ldStart.length;ldChain=[ldStart];ldCur='';ldAdj=null;
+  $('ldSub').textContent='Turn '+ldStart.toUpperCase()+' into '+ldEnd.toUpperCase()+' \u2014 one letter at a time (par '+ldPar+').';
   resetKeys();useKb(ldKey);drawLadder();}
-function drawLadder(){const bd=$('ldBoard');bd.innerHTML='';const rows=Math.max(ldChain.length+1,ldPar+1);const side=Math.min(gridSide(),ldLen*54);
+function drawLadder(){const bd=$('ldBoard');bd.innerHTML='';const side=Math.min(gridSide(),ldLen*54);
   setGrid(bd,ldLen,ldChain.length+1,side);document.documentElement.style.setProperty('--tf',Math.floor(side/ldLen*0.5)+'px');
-  ldChain.forEach((w,ri)=>{for(let c=0;c<ldLen;c++){const t=document.createElement('div');t.className='tile'+(w[c]===ldEnd[c]?' correct':'');t.textContent=w[c];bd.appendChild(t);}});
+  ldChain.forEach((w)=>{for(let c=0;c<ldLen;c++){const t=document.createElement('div');t.className='tile'+(w[c]===ldEnd[c]?' correct':'');t.textContent=w[c];bd.appendChild(t);}});
   for(let c=0;c<ldLen;c++){const t=document.createElement('div');t.className='tile'+(ldCur.length>c?' filled':'');t.textContent=ldCur[c]||'';bd.appendChild(t);}
   $('ldMsg').textContent='Target: '+ldEnd.toUpperCase()+' \u00b7 steps: '+(ldChain.length-1);}
-function ldKey(k){if(k==='enter'){const w=ldCur;if(w.length!==ldLen){toast('Need '+ldLen+' letters');return;}if(!DSET.has(w)){toast('Not a word');return;}const prev=ldChain[ldChain.length-1];let diff=0;for(let i=0;i<ldLen;i++)if(w[i]!==prev[i])diff++;if(diff!==1){toast('Change exactly one letter');return;}ldChain.push(w);ldCur='';drawLadder();if(w===ldEnd){const steps=ldChain.length-1;gameWin('Solved! \uD83C\uDF89','In '+steps+' steps (par '+ldPar+') \u2014 baby <b>Eli</b> approves \uD83D\uDC99',()=>{store.ldN=(store.ldN||0)+1;initLadder();});}return;}
+function ldKey(k){if(k==='enter'){const w=ldCur;if(w.length!==ldLen){toast('Need '+ldLen+' letters');return;}if(!DSET.has(w)){toast('Not a word');return;}const prev=ldChain[ldChain.length-1];let diff=0;for(let i=0;i<ldLen;i++)if(w[i]!==prev[i])diff++;if(diff!==1){toast('Change exactly one letter');return;}ldChain.push(w);ldCur='';drawLadder();if(w===ldEnd){const steps=ldChain.length-1;gs.ladder.solved++;if(steps<=ldPar)gs.ladder.best++;save();gameWin('Solved! \uD83C\uDF89','In '+steps+' steps (par '+ldPar+') \u2014 baby <b>Eli</b> approves \uD83D\uDC99',()=>{store.ldN=(store.ldN||0)+1;initLadder();});}return;}
   if(k==='back'){ldCur=ldCur.slice(0,-1);drawLadder();return;}
   if(/^[a-z]$/.test(k)&&ldCur.length<ldLen){ldCur+=k;drawLadder();}}
+function ldHint(){const nx=ldNext();if(!nx){toast('No hint available');return;}ldCur=nx;drawLadder();toast('Try: '+nx.toUpperCase());}
 
 /* ===================== BOGGLE ===================== */
 const DICE=["AAEEGN","ABBJOO","ACHOPS","AFFKPS","AOOTTW","CIMOTU","DEILRX","DELRVY","DISTTY","EEGHNW","EEINSU","EHRTVW","EIOSST","ELRTTY","HIMNQU","HLNNRZ"];
-let bgCells=[],bgPath=[],bgFound=[],bgTotal=0,bgScore=0,bgTimer=null,bgTime=0;
+let bgCells=[],bgPath=[],bgFound=[],bgTotal=0,bgScore=0,bgTimer=null,bgTime=0,bgSol=new Set();
 function initBoggle(){const dice=DICE.slice();shuffleArr(dice);bgCells=dice.map(d=>{let ch=d[rint(6)].toLowerCase();return ch==='q'?'qu':ch;});
-  bgPath=[];bgFound=[];bgScore=0;bgTime=120;
-  const sol=boggleSolve();bgTotal=sol.size;
-  noKb();drawBoggle();bgUpd();clearInterval(bgTimer);bgTimer=setInterval(()=>{bgTime--;if(bgTime<=0){clearInterval(bgTimer);bgTime=0;bgUpd();gameOver('Time!','Found '+bgFound.length+' of '+bgTotal+' \u00b7 '+bgScore+' pts',()=>{initBoggle();});}bgUpd();},1000);}
+  bgPath=[];bgFound=[];bgScore=0;bgTime=120;bgSol=boggleSolve();bgTotal=bgSol.size;
+  noKb();drawBoggle();bgUpd();clearInterval(bgTimer);bgTimer=setInterval(()=>{bgTime--;if(bgTime<=0){clearInterval(bgTimer);bgTime=0;bgUpd();gs.boggle.plays++;if(bgScore>gs.boggle.score)gs.boggle.score=bgScore;if(bgFound.length>gs.boggle.words)gs.boggle.words=bgFound.length;save();gameOver('Time!','Found '+bgFound.length+' of '+bgTotal+' \u00b7 '+bgScore+' pts',()=>{initBoggle();});}bgUpd();},1000);}
 function adj(i,j){const r1=(i/4)|0,c1=i%4,r2=(j/4)|0,c2=j%4;return Math.abs(r1-r2)<=1&&Math.abs(c1-c2)<=1&&i!==j;}
 function boggleSolve(){const found=new Set();const vis=Array(16).fill(false);
   function dfs(i,str){str+=bgCells[i];if(!PREF.has(str))return;if(str.length>=3&&DSET.has(str))found.add(str);
@@ -405,12 +471,13 @@ function boggleSolve(){const found=new Set();const vis=Array(16).fill(false);
   for(let i=0;i<16;i++){vis[i]=true;dfs(i,'');vis[i]=false;}return found;}
 function bgWord(){return bgPath.map(i=>bgCells[i]).join('');}
 function drawBoggle(){const bd=$('bgBoard');bd.innerHTML='';const side=gridSide();setGrid(bd,4,4,side);document.documentElement.style.setProperty('--tf',Math.floor(side/4*0.42)+'px');
-  bgCells.forEach((ch,i)=>{const t=document.createElement('div');t.className='tile'+(bgPath.includes(i)?' present':'');t.textContent=ch;t.onclick=()=>{const last=bgPath[bgPath.length-1];if(bgPath.includes(i)){if(i===last){bgPath.pop();}return;}if(bgPath.length===0||adj(last,i)){bgPath.push(i);}drawBoggle();bgUpd();};bd.appendChild(t);});}
+  bgCells.forEach((ch,i)=>{const t=document.createElement('div');t.className='tile'+(bgPath.includes(i)?' present':'');t.textContent=ch;t.onclick=()=>{const last=bgPath[bgPath.length-1];if(bgPath.includes(i)){if(i===last)bgPath.pop();return;}if(bgPath.length===0||adj(last,i))bgPath.push(i);drawBoggle();bgUpd();};bd.appendChild(t);});}
 function bgUpd(){$('bgBuilt').textContent=bgWord().toUpperCase();$('bgSub').textContent='\u23F1 '+bgTime+'s \u00b7 '+bgScore+' pts \u00b7 '+bgFound.length+'/'+bgTotal;
   $('bgFound').innerHTML=bgFound.map(w=>'<span>'+w+'</span>').join('');}
 function bgPts(w){const l=w.length;return l<=4?1:l===5?2:l===6?3:l===7?5:11;}
 $('bgClear').onclick=()=>{bgPath=[];drawBoggle();bgUpd();};
 $('bgEnter').onclick=()=>{const w=bgWord();bgPath=[];if(w.length<3){toast('Too short');drawBoggle();bgUpd();return;}if(bgFound.includes(w)){toast('Already found');drawBoggle();bgUpd();return;}if(!DSET.has(w)){toast('Not a word');drawBoggle();bgUpd();return;}bgFound.push(w);bgScore+=bgPts(w);toast('+'+bgPts(w));drawBoggle();bgUpd();};
+function bgHint(){const left=[...bgSol].filter(w=>!bgFound.includes(w)).sort((a,b)=>a.length-b.length);if(!left.length){toast('All found!');return;}toast('Try: '+left[0].toUpperCase());}
 
 /* ===================== ANAGRAM ===================== */
 let anWord='',anLetters=[],anBuilt=[],anFound=[],anPossible=new Set();
@@ -424,59 +491,64 @@ function anStr(){return anBuilt.map(i=>anLetters[i]).join('');}
 function anUpd(){$('anBuilt').textContent=anStr();$('anFound').innerHTML='<b>'+anFound.length+'/'+anPossible.size+'</b> found<br>'+anFound.map(w=>'<span>'+w+'</span>').join('');}
 $('anDel').onclick=()=>{anBuilt.pop();drawAnagram();anUpd();};
 $('anShuf').onclick=()=>{shuffleArr(anLetters);anBuilt=[];drawAnagram();anUpd();};
-$('anEnter').onclick=()=>{const w=anStr();anBuilt=[];if(w.length<3){toast('Too short');drawAnagram();anUpd();return;}if(anFound.includes(w)){toast('Already found');drawAnagram();anUpd();return;}if(!anPossible.has(w)){toast('Not a word');drawAnagram();anUpd();return;}anFound.push(w);toast('Nice!');if(anFound.length===anPossible.size){gameWin('All found! \uD83C\uDF89','Every word \u2014 baby <b>Eli</b> is impressed \uD83D\uDC99',()=>{store.anN=(store.anN||0)+1;initAnagram();});}drawAnagram();anUpd();};
+$('anEnter').onclick=()=>{const w=anStr();anBuilt=[];if(w.length<3){toast('Too short');drawAnagram();anUpd();return;}if(anFound.includes(w)){toast('Already found');drawAnagram();anUpd();return;}if(!anPossible.has(w)){toast('Not a word');drawAnagram();anUpd();return;}anFound.push(w);if(anFound.length>gs.anagram.best)gs.anagram.best=anFound.length;save();toast('Nice!');if(anFound.length===anPossible.size){gameWin('All found! \uD83C\uDF89','Every word \u2014 baby <b>Eli</b> is impressed \uD83D\uDC99',()=>{store.anN=(store.anN||0)+1;initAnagram();});}drawAnagram();anUpd();};
+function anHint(){const left=[...anPossible].filter(w=>!anFound.includes(w)).sort((a,b)=>a.length-b.length);if(!left.length){toast('All found!');return;}const w=left[0];toast('Try: '+w.slice(0,2).toUpperCase()+'\u2026 ('+w.length+')');}
 
 /* ===================== WORD SEARCH ===================== */
-let seGrid=[],seWords=[],seFound=[],seSel=[],seN=10;
-function initSearch(){const th=THEMES[(dayIndex()+(store.seN||0))%THEMES.length];seWords=th.w.map(w=>w.toLowerCase()).filter(w=>w.length<=seN);seFound=[];seSel=[];
+let seGrid=[],seWords=[],seFound=[],seSel=[],seN=10,sePlace={},seCells={},seFlash=null;
+function initSearch(){const th=THEMES[(dayIndex()+(store.seN||0))%THEMES.length];seWords=th.w.map(w=>w.toLowerCase()).filter(w=>w.length<=seN);seFound=[];seSel=[];sePlace={};seCells={};seFlash=null;
   seGrid=Array.from({length:seN},()=>Array(seN).fill(''));
   const dirs=[[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];
-  for(const w of seWords){let placed=false;for(let tr=0;tr<200&&!placed;tr++){const d=dirs[rint(dirs.length)];const r=rint(seN),c=rint(seN);const er=r+d[0]*(w.length-1),ec=c+d[1]*(w.length-1);if(er<0||er>=seN||ec<0||ec>=seN)continue;let ok=true;for(let i=0;i<w.length;i++){const cc=seGrid[r+d[0]*i][c+d[1]*i];if(cc&&cc!==w[i]){ok=false;break;}}if(!ok)continue;for(let i=0;i<w.length;i++)seGrid[r+d[0]*i][c+d[1]*i]=w[i];placed=true;}}
+  for(const w of seWords){let placed=false;for(let tr=0;tr<300&&!placed;tr++){const d=dirs[rint(dirs.length)];const r=rint(seN),c=rint(seN);const er=r+d[0]*(w.length-1),ec=c+d[1]*(w.length-1);if(er<0||er>=seN||ec<0||ec>=seN)continue;let ok=true;for(let i=0;i<w.length;i++){const cc=seGrid[r+d[0]*i][c+d[1]*i];if(cc&&cc!==w[i]){ok=false;break;}}if(!ok)continue;const cells=[];for(let i=0;i<w.length;i++){seGrid[r+d[0]*i][c+d[1]*i]=w[i];cells.push([r+d[0]*i,c+d[1]*i]);}sePlace[w]=cells;placed=true;}}
   for(let r=0;r<seN;r++)for(let c=0;c<seN;c++)if(!seGrid[r][c])seGrid[r][c]='abcdefghijklmnopqrstuvwxyz'[rint(26)];
   $('seSub').textContent=th.n+' \u2014 tap first then last letter of a word.';noKb();drawSearch();}
-function drawSearch(){const bd=$('seBoard');bd.innerHTML='';const side=gridSide();setGrid(bd,seN,seN,side);document.documentElement.style.setProperty('--tf',Math.floor(side/seN*0.5)+'px');
-  for(let r=0;r<seN;r++)for(let c=0;c<seN;c++){const t=document.createElement('div');t.className='tile';t.style.fontSize=Math.floor(side/seN*0.5)+'px';t.textContent=seGrid[r][c];
+function drawSearch(){const bd=$('seBoard');bd.innerHTML='';const side=gridSide();setGrid(bd,seN,seN,side);const fs=Math.floor(side/seN*0.5);document.documentElement.style.setProperty('--tf',fs+'px');
+  for(let r=0;r<seN;r++)for(let c=0;c<seN;c++){const t=document.createElement('div');t.style.fontSize=fs+'px';t.className='tile';t.textContent=seGrid[r][c];
     if(seFoundCell(r,c))t.classList.add('correct');if(seSel[0]&&seSel[0][0]===r&&seSel[0][1]===c)t.classList.add('present');
+    if(seFlash&&seFlash[0]===r&&seFlash[1]===c)t.classList.add('hint');
     t.onclick=()=>seTap(r,c);bd.appendChild(t);}
   $('seList').innerHTML=seWords.map(w=>'<span style="'+(seFound.includes(w)?'text-decoration:line-through;color:var(--accent)':'')+'">'+w+'</span>').join('');}
 function seFoundCell(r,c){return seFound.some(w=>seCells[w]&&seCells[w].some(p=>p[0]===r&&p[1]===c));}
-let seCells={};
-function seTap(r,c){if(!seSel.length){seSel=[[r,c]];drawSearch();return;}const [r0,c0]=seSel[0];const dr=r-r0,dc=c-c0;
+function seTap(r,c){seFlash=null;if(!seSel.length){seSel=[[r,c]];drawSearch();return;}const [r0,c0]=seSel[0];const dr=r-r0,dc=c-c0;
   if(!((dr===0||dc===0||Math.abs(dr)===Math.abs(dc)))){seSel=[[r,c]];drawSearch();return;}
   const len=Math.max(Math.abs(dr),Math.abs(dc))+1;const sr=dr===0?0:dr>0?1:-1,sc=dc===0?0:dc>0?1:-1;let str='';const cells=[];
   for(let i=0;i<len;i++){const rr=r0+sr*i,cc=c0+sc*i;str+=seGrid[rr][cc];cells.push([rr,cc]);}
   const rev=str.split('').reverse().join('');const match=seWords.find(w=>(w===str||w===rev)&&!seFound.includes(w));
-  if(match){seFound.push(match);seCells[match]=cells;toast(match.toUpperCase()+'!');if(seFound.length===seWords.length)gameWin('All found! \uD83C\uDF89','Whole list \u2014 baby <b>Eli</b> cheers \uD83D\uDC99',()=>{store.seN=(store.seN||0)+1;initSearch();});}
+  if(match){seFound.push(match);seCells[match]=cells;toast(match.toUpperCase()+'!');if(seFound.length===seWords.length){gs.search.done++;save();gameWin('All found! \uD83C\uDF89','Whole list \u2014 baby <b>Eli</b> cheers \uD83D\uDC99',()=>{store.seN=(store.seN||0)+1;initSearch();});}}
   seSel=[];drawSearch();}
+function seHint(){const left=seWords.filter(w=>!seFound.includes(w));if(!left.length){toast('All found!');return;}const w=left[0];const c=sePlace[w][0];seFlash=c;drawSearch();toast(w.toUpperCase()+' starts here');setTimeout(()=>{seFlash=null;drawSearch();},1800);}
 
 /* ===================== HANGMAN ===================== */
-let hmWord='',hmGuessed=new Set(),hmWrong=0;
-function initHangman(){const pool=DICTBIG.filter(w=>w.length>=5&&w.length<=8);hmWord=pool[(dayIndex()+(store.hmN||0))%pool.length];hmGuessed=new Set();hmWrong=0;
+let hmWord='',hmGuessed=new Set(),hmWrong=0,hmDone=false;
+function initHangman(){const pool=DICTBIG.filter(w=>w.length>=5&&w.length<=8);hmWord=pool[(dayIndex()+(store.hmN||0))%pool.length];hmGuessed=new Set();hmWrong=0;hmDone=false;
   $('hmSub').textContent='Guess the word \u2014 6 wrong allowed.';resetKeys();useKb(hmKey);drawHangman();}
-function hmKey(k){if(!/^[a-z]$/.test(k))return;if(hmGuessed.has(k))return;hmGuessed.add(k);
+function hmGuess(k){if(hmDone||hmGuessed.has(k))return;hmGuessed.add(k);
   if(hmWord.includes(k)){keyEls[k].classList.add('correct');}else{hmWrong++;keyEls[k].classList.add('absent');}drawHangman();
-  if([...hmWord].every(c=>hmGuessed.has(c))){gameWin('Got it! \uD83C\uDF89','<b>'+hmWord.toUpperCase()+'</b> \u2014 baby <b>Eli</b> claps \uD83D\uDC99',()=>{store.hmN=(store.hmN||0)+1;initHangman();});}
-  else if(hmWrong>=6){[...hmWord].forEach(()=>{});gameOver('Out of lives','The word was <b>'+hmWord.toUpperCase()+'</b>',()=>{store.hmN=(store.hmN||0)+1;initHangman();});}}
-function drawHangman(){$('hmLives').innerHTML='\u2764\uFE0F'.repeat(Math.max(0,6-hmWrong))+'\uD83D\uDDA4'.repeat(hmWrong);
+  if([...hmWord].every(c=>hmGuessed.has(c))){hmDone=true;gs.hangman.w++;gs.hangman.streak++;if(gs.hangman.streak>gs.hangman.best)gs.hangman.best=gs.hangman.streak;save();gameWin('Got it! \uD83C\uDF89','<b>'+hmWord.toUpperCase()+'</b> \u2014 baby <b>Eli</b> claps \uD83D\uDC99',()=>{store.hmN=(store.hmN||0)+1;initHangman();});}
+  else if(hmWrong>=6){hmDone=true;gs.hangman.l++;gs.hangman.streak=0;save();gameOver('Out of lives','The word was <b>'+hmWord.toUpperCase()+'</b>',()=>{store.hmN=(store.hmN||0)+1;initHangman();});}}
+function hmKey(k){if(/^[a-z]$/.test(k))hmGuess(k);}
+function drawHangman(){$('hmLives').innerHTML='\u2764\uFE0F'.repeat(Math.max(0,6-hmWrong))+'\uD83E\uDD0D'.repeat(hmWrong);
   $('hmWord').textContent=[...hmWord].map(c=>hmGuessed.has(c)?c:'_').join(' ');}
+function hmHint(){if(hmDone)return;const left=[...new Set(hmWord.split(''))].filter(c=>!hmGuessed.has(c));if(!left.length)return;hmGuess(left[rint(left.length)]);}
 
 /* ===================== CONNECTIONS ===================== */
-let cnGroups=[],cnTiles=[],cnSel=[],cnSolvedG=[],cnMiss=0;
-const CNCOL=['#a0c35a','#f4d35e','#5aa9e6','#c98bd1'];
-function initConnect(){const p=CONN[(dayIndex()+(store.cnN||0))%CONN.length];cnGroups=p;cnSolvedG=[];cnSel=[];cnMiss=0;
+let cnGroups=[],cnTiles=[],cnSel=[],cnSolvedG=[],cnMiss=0,cnDone=false;
+const CNCOL=['#a8c85a','#e6c34a','#6aabe6','#c987d6'];
+function initConnect(){const p=CONN[(dayIndex()+(store.cnN||0))%CONN.length];cnGroups=p;cnSolvedG=[];cnSel=[];cnMiss=0;cnDone=false;
   cnTiles=[];p.forEach(g=>g.w.forEach(w=>cnTiles.push(w)));shuffleArr(cnTiles);
-  $('cnSub').textContent='Make four groups of four. Mistakes: 0/4';noKb();drawConnect();}
-function drawConnect(){$('cnSolved').innerHTML=cnSolvedG.map(gi=>{const g=cnGroups[gi];return '<div style="background:'+CNCOL[g.d]+';color:#12161b;border-radius:8px;padding:7px;margin-bottom:5px;font-size:.8rem;font-weight:700">'+g.n+': '+g.w.join(', ')+'</div>';}).join('');
+  gs.connect.plays++;save();noKb();drawConnect();}
+function drawConnect(){$('cnSolved').innerHTML=cnSolvedG.map(gi=>{const g=cnGroups[gi];return '<div style="background:'+CNCOL[g.d]+';color:#1b1f24;border-radius:8px;padding:7px;margin-bottom:5px;font-size:.8rem;font-weight:700">'+g.n+': '+g.w.join(', ')+'</div>';}).join('');
   const bd=$('cnBoard');bd.innerHTML='';const remain=cnTiles.filter(w=>!cnSolvedG.some(gi=>cnGroups[gi].w.includes(w)));
-  const cols=2,rows=Math.ceil(remain.length/cols);bd.style.width='min(94vw,380px)';bd.style.height='';bd.style.gridTemplateColumns='1fr 1fr';bd.style.gridTemplateRows='';
-  remain.forEach(w=>{const t=document.createElement('div');t.className='tile';t.style.height='52px';t.style.fontSize='.8rem';t.style.padding='2px';t.style.textTransform='none';if(cnSel.includes(w)){t.style.background='var(--key)';t.style.borderColor='var(--accent)';}t.textContent=w;
+  bd.style.width='min(94vw,380px)';bd.style.height='';bd.style.gridTemplateColumns='1fr 1fr';bd.style.gridTemplateRows='';
+  remain.forEach(w=>{const t=document.createElement('div');t.className='tile';t.style.height='52px';t.style.fontSize='.8rem';t.style.padding='2px';t.style.textTransform='none';if(cnSel.includes(w)){t.style.background='rgba(47,158,110,.16)';t.style.borderColor='var(--accent)';}t.textContent=w;
     t.onclick=()=>{if(cnSel.includes(w))cnSel=cnSel.filter(x=>x!==w);else if(cnSel.length<4)cnSel.push(w);drawConnect();};bd.appendChild(t);});
   $('cnSub').textContent='Make four groups of four. Mistakes: '+cnMiss+'/4';}
 $('cnShuf').onclick=()=>{shuffleArr(cnTiles);drawConnect();};
 $('cnDe').onclick=()=>{cnSel=[];drawConnect();};
-$('cnSubmit').onclick=()=>{if(cnSel.length!==4){toast('Pick 4');return;}const gi=cnGroups.findIndex(g=>cnSel.every(w=>g.w.includes(w)));
-  if(gi>=0&&!cnSolvedG.includes(gi)){cnSolvedG.push(gi);cnSel=[];drawConnect();if(cnSolvedG.length===4)gameWin('Solved! \uD83C\uDF89','All four groups \u2014 baby <b>Eli</b> is proud \uD83D\uDC99',()=>{store.cnN=(store.cnN||0)+1;initConnect();});}
-  else{cnMiss++;cnSel=[];drawConnect();if(cnMiss>=4){const names=cnGroups.map(g=>g.n+': '+g.w.join(', ')).join('<br>');gameOver('Out of tries',names,()=>{store.cnN=(store.cnN||0)+1;initConnect();});}else toast('Not a group');}};
+$('cnSubmit').onclick=()=>{if(cnDone)return;if(cnSel.length!==4){toast('Pick 4');return;}const gi=cnGroups.findIndex(g=>cnSel.every(w=>g.w.includes(w)));
+  if(gi>=0&&!cnSolvedG.includes(gi)){cnSolvedG.push(gi);cnSel=[];drawConnect();if(cnSolvedG.length===4){cnDone=true;gs.connect.solved++;save();gameWin('Solved! \uD83C\uDF89','All four groups \u2014 baby <b>Eli</b> is proud \uD83D\uDC99',()=>{store.cnN=(store.cnN||0)+1;initConnect();});}}
+  else{cnMiss++;cnSel=[];drawConnect();if(cnMiss>=4){cnDone=true;const names=cnGroups.map(g=>g.n+': '+g.w.join(', ')).join('<br>');gameOver('Out of tries',names,()=>{store.cnN=(store.cnN||0)+1;initConnect();});}else toast('Not a group');}};
+function cnHint(){const un=cnGroups.map((g,i)=>i).filter(i=>!cnSolvedG.includes(i));if(!un.length){toast('All solved!');return;}toast('Hint: one group is \u201C'+cnGroups[un[rint(un.length)]].n+'\u201D');}
 
 /* ===================== CROSSWORD ===================== */
 let cwP=null,cwCells=[],cwSel=0;
@@ -486,17 +558,21 @@ function initCross(){cwP=CROSS[(dayIndex()+(store.cwN||0))%CROSS.length];cwCells
 function drawCross(){const bd=$('cwBoard');bd.innerHTML='';const side=Math.min(gridSide(),300);setGrid(bd,5,5,side);document.documentElement.style.setProperty('--tf',Math.floor(side/5*0.5)+'px');
   for(let i=0;i<25;i++){const t=document.createElement('div');t.className='tile'+(i===cwSel?' filled':'');t.textContent=cwCells[i];if(i===cwSel)t.style.borderColor='var(--accent)';t.onclick=()=>{cwSel=i;drawCross();};bd.appendChild(t);}}
 function cwKey(k){if(k==='back'){cwCells[cwSel]='';if(cwSel%5>0)cwSel--;drawCross();return;}if(k==='enter'){cwCheck();return;}
-  if(/^[a-z]$/.test(k)){cwCells[cwSel]=k;if(cwSel%5<4)cwSel++;else if(cwSel<24)cwSel++;drawCross();}}
+  if(/^[a-z]$/.test(k)){cwCells[cwSel]=k;if(cwSel<24)cwSel++;drawCross();}}
 $('cwCheck').onclick=cwCheck;
-function cwCheck(){let ok=true;for(let r=0;r<5;r++)for(let c=0;c<5;c++){if(cwCells[r*5+c]!==cwP.r[r][c]){ok=false;}}
-  if(ok){gameWin('Solved! \uD83C\uDF89','Crossword complete \u2014 baby <b>Eli</b> beams \uD83D\uDC99',()=>{store.cwN=(store.cwN||0)+1;initCross();});}
+function cwCheck(){let ok=true;for(let r=0;r<5;r++)for(let c=0;c<5;c++){if(cwCells[r*5+c]!==cwP.r[r][c])ok=false;}
+  if(ok){gs.cross.solved++;save();gameWin('Solved! \uD83C\uDF89','Crossword complete \u2014 baby <b>Eli</b> beams \uD83D\uDC99',()=>{store.cwN=(store.cwN||0)+1;initCross();});}
   else{const bd=$('cwBoard');bd.classList.remove('shake');void bd.offsetWidth;bd.classList.add('shake');
     for(let i=0;i<25;i++){const t=bd.children[i];const r=(i/5)|0,c=i%5;if(cwCells[i]&&cwCells[i]!==cwP.r[r][c])t.classList.add('absent');}toast('Not quite \u2014 grey = wrong');}}
 $('cwNew').onclick=()=>{store.cwN=(store.cwN||0)+1;initCross();};
+function cwHint(){const r=(cwSel/5)|0,c=cwSel%5;cwCells[cwSel]=cwP.r[r][c];if(cwSel<24)cwSel++;drawCross();toast('Filled '+cwP.r[r][c].toUpperCase());}
+
+const HINT={wordle:wDoHint,honey:hyHint,ladder:ldHint,boggle:bgHint,anagram:anHint,search:seHint,hangman:hmHint,connect:cnHint,cross:cwHint};
+function hyHint(){const left=[...hyValid].filter(w=>!hyFound.includes(w)).sort((a,b)=>a.length-b.length);if(!left.length){toast('All found!');return;}const w=left[0];toast('Try: '+w.slice(0,2).toUpperCase()+'\u2026 ('+w.length+')');}
 
 /* go */
 show('home');
-if(!store.seen){$('helpModal').classList.add('show');store.seen=1;save();}
+if(!store.seen){const i=INSTR.home;$('helpTitle').textContent=i.t;$('helpBody').innerHTML=i.b;$('helpModal').classList.add('show');store.seen=1;save();}
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 </script>
 </body>
