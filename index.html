@@ -132,7 +132,17 @@
   .supad{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:430px;margin-top:4px;}
   .supad button{width:40px;height:46px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.15rem;font-weight:800;cursor:pointer;}
   /* solitaire */
-  .so-wrap{padding:8px;overflow:auto;height:100%;}
+  .so-wrap{padding:8px;overflow:auto;flex:1 1 auto;min-height:0;}
+  .so-bar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap;}
+  .so-bar .sb{background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.76rem;font-weight:700;cursor:pointer;}
+  .so-info{font-size:.76rem;color:var(--muted);white-space:nowrap;}.so-info b{color:var(--ink);}
+  .so-spacer2{flex:1 1 auto;}
+  .pcard{position:relative;}
+  .pc-tl{position:absolute;top:3px;left:5px;}
+  .pc-br{position:absolute;bottom:3px;right:5px;font-size:.72em;opacity:.8;}
+  .so-col.so-valid,.card-slot.so-valid{outline:2px dashed var(--accent);outline-offset:-2px;border-radius:7px;}
+  .so-col.so-over,.card-slot.so-over{outline:3px solid var(--accent);outline-offset:-2px;border-radius:7px;background:rgba(47,158,110,.12);}
+  #scr-solitaire.landscape{position:fixed;top:50%;left:50%;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;z-index:60;background:var(--bg);overflow:hidden;}
   .so-top{display:flex;gap:4px;align-items:flex-start;margin-bottom:14px;}
   .so-spacer{flex:1 1 auto;min-width:4px;}
   .card-slot{width:44px;height:62px;flex:0 0 auto;}
@@ -145,6 +155,11 @@
   .pcard.back{background:repeating-linear-gradient(45deg,#3a72ad,#3a72ad 5px,#5390cf 5px,#5390cf 10px);border-color:#3a72ad;color:transparent;}
   .pcard.sel{outline:3px solid var(--accent);outline-offset:-2px;}
   .slot-empty{width:100%;height:62px;border-radius:5px;border:1px dashed var(--line);background:rgba(0,0,0,.03);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.1rem;cursor:pointer;}
+  /* memory */
+  .grid.memory{gap:7px;}
+  .mecard{display:flex;align-items:center;justify-content:center;border-radius:11px;cursor:pointer;font-size:min(8.5vw,2.1rem);background:var(--accent);border:1px solid var(--accent);color:transparent;transition:background .12s;}
+  .mecard.up{background:var(--panel);border-color:var(--tb);color:var(--ink);}
+  .mecard.done{background:rgba(47,158,110,.14);border-color:var(--accent);color:var(--ink);}
   @media (prefers-reduced-motion: reduce){#confetti{display:none!important;}.shake{animation:none!important;}}
 </style>
 </head>
@@ -229,8 +244,17 @@
     </div>
 
     <div class="screen" id="scr-solitaire">
+      <div class="so-bar">
+        <button class="sb" id="soBack">&larr; Games</button>
+        <div class="so-info"><b id="soMoves">0</b> moves &middot; <span id="soTime">0:00</span></div>
+        <div class="so-spacer2"></div>
+        <button class="sb" id="soDrawTog">Draw 1</button>
+        <button class="sb" id="soHintB">Hint</button>
+        <button class="sb" id="soUndoB">Undo</button>
+        <button class="sb" id="soAutoB">Auto</button>
+        <button class="sb" id="soNew">New</button>
+      </div>
       <div class="so-wrap">
-        <div class="sub" id="soSub" style="margin-bottom:8px"></div>
         <div class="so-top">
           <div class="card-slot" id="soStock"></div>
           <div class="card-slot" id="soWaste"></div>
@@ -241,8 +265,13 @@
           <div class="card-slot" id="soF3"></div>
         </div>
         <div class="so-cols" id="soCols"></div>
-        <div class="barrow" style="margin-top:12px;max-width:430px"><button class="minibtn" id="soNew" style="flex:1">New</button><button class="minibtn" id="soUndoB" style="flex:1">Undo</button><button class="seg active" id="soAutoB" style="flex:1.2">Auto</button></div>
       </div>
+    </div>
+
+    <div class="screen" id="scr-memory">
+      <div class="barrow" id="meBar"></div>
+      <main class="play"><div class="sub" id="meSub"></div>
+        <div class="grid memory" id="meBoard"></div></main>
     </div>
 
   </div>
@@ -305,7 +334,7 @@ store.stats=Object.assign({played:0,wins:0,cur:0,max:0,dist:[0,0,0,0,0],lastWonD
 if(!Array.isArray(store.stats.dist)||store.stats.dist.length!==5)store.stats.dist=[0,0,0,0,0];
 store.daily=Object.assign({day:null,guesses:[],done:false,won:false},store.daily||{});
 store.practice=Object.assign({len:5,levels:{}},store.practice||{});
-store.gs=Object.assign({honey:{score:0,words:0},ladder:{solved:0,best:0},boggle:{score:0,words:0,plays:0},anagram:{best:0},search:{done:0},hangman:{w:0,l:0,streak:0,best:0},connect:{solved:0,plays:0},cross:{solved:0},sudoku:{solved:0},solitaire:{won:0,played:0}},store.gs||{});
+store.gs=Object.assign({honey:{score:0,words:0},ladder:{solved:0,best:0},boggle:{score:0,words:0,plays:0},anagram:{best:0},search:{done:0},hangman:{w:0,l:0,streak:0,best:0},connect:{solved:0,plays:0},cross:{solved:0},sudoku:{solved:0},solitaire:{won:0,played:0},memory:{won:0,best:0}},store.gs||{});
 if(store.winCount==null)store.winCount=0;
 const save=()=>STORE.set(store);
 const gs=store.gs;
@@ -335,14 +364,15 @@ document.addEventListener('keydown',e=>{if(document.querySelector('.overlay.show
 
 /* router */
 let curScreen='home';
-const TITLES={home:"Eli's Games",stats:"Stats",wordle:"Wordle",honey:"Spelling Bee",ladder:"Word Ladder",boggle:"Boggle",anagram:"Anagram",search:"Word Search",hangman:"Hangman",connect:"Connections",cross:"Crossword",sudoku:"Sudoku",solitaire:"Solitaire"};
-const INIT={stats:renderStats,wordle:initWordle,honey:initHoney,ladder:initLadder,boggle:initBoggle,anagram:initAnagram,search:initSearch,hangman:initHangman,connect:initConnect,cross:initCross,sudoku:initSudoku,solitaire:initSolitaire};
+const TITLES={home:"Eli's Games",stats:"Stats",wordle:"Wordle",honey:"Spelling Bee",ladder:"Word Ladder",boggle:"Boggle",anagram:"Anagram",search:"Word Search",hangman:"Hangman",connect:"Connections",cross:"Crossword",sudoku:"Sudoku",solitaire:"Solitaire",memory:"Memory"};
+const INIT={stats:renderStats,wordle:initWordle,honey:initHoney,ladder:initLadder,boggle:initBoggle,anagram:initAnagram,search:initSearch,hangman:initHangman,connect:initConnect,cross:initCross,sudoku:initSudoku,solitaire:initSolitaire,memory:initMemory};
 function show(id){curScreen=id;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$('scr-'+id).classList.add('on');
   $('backBtn').style.visibility=id==='home'?'hidden':'visible';
   $('statsBtn').style.display=id==='home'?'':'none';
   $('hintBtn').style.display=(HINT[id])?'':'none';
   const t=TITLES[id]||"Eli's Games";$('title').innerHTML=(id==='home')?(t+'<span class="dot">.</span>'):t;
-  noKb();resetKeys();if(INIT[id])INIT[id]();}
+  noKb();resetKeys();applySoOrient();if(INIT[id])INIT[id]();}
+function applySoOrient(){const sc=$('scr-solitaire');if(!sc)return;const portrait=window.matchMedia?window.matchMedia('(orientation: portrait)').matches:true;sc.classList.toggle('landscape',curScreen==='solitaire'&&portrait);}
 $('backBtn').onclick=()=>show('home');
 $('statsBtn').onclick=()=>show('stats');
 $('hintBtn').onclick=()=>{if(HINT[curScreen])HINT[curScreen]();};
@@ -359,7 +389,8 @@ const GAMES=[["wordle","\uD83D\uDFE9","Wordle","Daily 5-letter + practice 3\u201
  ["connect","\uD83E\uDDE9","Connections","Group 16 into 4"],
  ["cross","\u270F\uFE0F","Crossword","Fill the mini grid"],
  ["sudoku","\uD83D\uDD22","Sudoku","Fill 1\u20139, no repeats"],
- ["solitaire","\uD83C\uDCCF","Solitaire","Classic Klondike patience"]];
+ ["solitaire","\uD83C\uDCCF","Solitaire","Classic Klondike patience"],
+ ["memory","\uD83E\uDDE0","Memory","Match the pairs"]];
 (function(){const c=$('cards');GAMES.forEach(g=>{const d=document.createElement('button');d.className='card';
   d.innerHTML='<div class="emoji">'+g[1]+'</div><h3>'+g[2]+'</h3><p>'+g[3]+'</p>';d.onclick=()=>show(g[0]);c.appendChild(d);});})();
 
@@ -375,7 +406,8 @@ const INSTR={
  connect:{t:"Connections",b:"Sort the 16 words into <b>4 hidden groups of 4</b>. Select four words then <b>Submit</b>. Four wrong guesses and the game ends. \uD83D\uDCA1 names one group."},
  cross:{t:"Crossword",b:"Fill every square so that each <b>row and column</b> spells a word. Tap a square and type a letter; use the Across and Down clues. <b>Check</b> marks wrong letters grey. \uD83D\uDCA1 fills the selected square."},
  sudoku:{t:"Sudoku",b:"Fill the grid so every <b>row, column and 3\u00d73 box</b> contains 1\u20139 with no repeats. Tap a square, then a number (or \u2326 to clear). Pick <b>Easy / Medium / Hard</b>, and \uD83D\uDCA1 fills the selected square."},
- solitaire:{t:"Solitaire",b:"Klondike patience. Build the four <b>foundations up by suit</b> from Ace to King. On the table, stack <b>down in alternating colours</b>; only Kings start an empty column. <br><br>Tap a card to pick it up, then tap where to place it. Tap the deck to draw. <b>Auto</b> sends every available card to the foundations, and <b>Undo</b> takes back a move."},
+ solitaire:{t:"Solitaire",b:"Klondike patience \u2014 turn your phone <b>sideways</b> to play. Build the four <b>foundations up by suit</b> from Ace to King; on the table, stack <b>down in alternating colours</b>, and only Kings start an empty column.<br><br><b>Tap</b> a card to shoot it straight to a foundation, or <b>drag</b> it (valid spots light up green) to place it anywhere. Tap the deck to draw \u2014 toggle <b>Draw 1/3</b> in the bar. <b>Auto</b> clears everything it can, <b>Undo</b> takes moves back, and a move counter and timer sit up top."},
+ memory:{t:"Memory",b:"Tap two cards to turn them over. If they <b>match</b>, they stay; if not, they flip back. Find every pair in as <b>few moves</b> as you can. Pick Easy / Medium / Hard, and \uD83D\uDCA1 briefly reveals a matching pair."},
  stats:{t:"Stats",b:"Your scores across all nine games, saved on this device."}
 };
 
@@ -394,7 +426,8 @@ function renderStats(){const s=store.stats,g=gs;const wpct=s.played?Math.round(s
    card('\uD83E\uDDE9','Connections',[['Solved',g.connect.solved],['Played',g.connect.plays]])+
    card('\u270F\uFE0F','Crossword',[['Solved',g.cross.solved]])+
    card('\uD83D\uDD22','Sudoku',[['Solved',g.sudoku.solved]])+
-   card('\uD83C\uDCCF','Solitaire',[['Won',g.solitaire.won],['Played',g.solitaire.played],['Win %',g.solitaire.played?Math.round(g.solitaire.won/g.solitaire.played*100):0]]);
+   card('\uD83C\uDCCF','Solitaire',[['Won',g.solitaire.won],['Played',g.solitaire.played],['Win %',g.solitaire.played?Math.round(g.solitaire.won/g.solitaire.played*100):0]])+
+   card('\uD83E\uDDE0','Memory',[['Won',g.memory.won],['Best (moves)',g.memory.best||'\u2013']]);
 }
 
 function gridSide(){return Math.floor(Math.min(window.innerWidth*0.9,window.innerHeight*0.5,460));}
@@ -645,53 +678,105 @@ function suHint(){if(suDone)return;let p=(suSel>=0&&!suGiven[suSel]&&!suCells[su
 /* ===================== SOLITAIRE (Klondike) ===================== */
 const SUITS=['\u2663','\u2666','\u2665','\u2660'];
 let soStock=[],soWaste=[],soFound=[[],[],[],[]],soTab=[[],[],[],[],[],[],[]],soSel=null,soUndo=[];
+let soMoves=0,soT0=0,soTid=null,soDraw3=false,soDrag=null,soValid=new Set();
 function soRed(s){return s===1||s===2;}
 function soLbl(r){return r===1?'A':r===11?'J':r===12?'Q':r===13?'K':''+r;}
-function initSolitaire(){const inProg=soTab.some(p=>p.length)||soFound.some(f=>f.length)||soStock.length||soWaste.length;if(inProg){noKb();soRender();}else{gs.solitaire.played++;save();soDeal();}}
+function initSolitaire(){const inProg=soTab.some(p=>p.length)||soFound.some(f=>f.length)||soStock.length||soWaste.length;if(inProg){noKb();soRender();soInfo();}else{gs.solitaire.played++;save();soDeal();}}
 function soDeal(){const deck=[];for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({s,r,up:false});shuffleArr(deck);
   soFound=[[],[],[],[]];soTab=[[],[],[],[],[],[],[]];soWaste=[];soUndo=[];soSel=null;let k=0;
   for(let c=0;c<7;c++)for(let i=0;i<=c;i++){const card=deck[k++];card.up=(i===c);soTab[c].push(card);}
-  soStock=deck.slice(k);soStock.forEach(c=>c.up=false);noKb();soRender();}
-function soSnap(){soUndo.push(JSON.stringify({a:soStock,b:soWaste,f:soFound,t:soTab}));if(soUndo.length>300)soUndo.shift();}
-function soUndoMove(){if(!soUndo.length){toast('Nothing to undo');return;}const st=JSON.parse(soUndo.pop());soStock=st.a;soWaste=st.b;soFound=st.f;soTab=st.t;soSel=null;soRender();}
-function soDraw(){soSnap();if(soStock.length){const c=soStock.pop();c.up=true;soWaste.push(c);}else{while(soWaste.length){const c=soWaste.pop();c.up=false;soStock.push(c);}}soSel=null;soRender();}
+  soStock=deck.slice(k);soStock.forEach(c=>c.up=false);
+  soMoves=0;if(soTid){clearInterval(soTid);soTid=null;}soT0=0;noKb();soRender();soInfo();}
+function soInfo(){const m=$('soMoves');if(m)m.textContent=soMoves;const t=$('soTime');if(t){const s=soT0?Math.floor((Date.now()-soT0)/1000):0;t.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}}
+function soTimer(){if(!soTid){soT0=Date.now();soTid=setInterval(soInfo,1000);}}
+function soBump(){soMoves++;soTimer();}
+function soSnap(){soUndo.push(JSON.stringify({a:soStock,b:soWaste,f:soFound,t:soTab,m:soMoves}));if(soUndo.length>400)soUndo.shift();}
+function soUndoMove(){if(!soUndo.length){toast('Nothing to undo');return;}const st=JSON.parse(soUndo.pop());soStock=st.a;soWaste=st.b;soFound=st.f;soTab=st.t;soMoves=st.m;soSel=null;soRender();soInfo();}
+function soDraw(){soSnap();if(soStock.length){const n=Math.min(soDraw3?3:1,soStock.length);for(let i=0;i<n;i++){const c=soStock.pop();c.up=true;soWaste.push(c);}soTimer();}else if(soWaste.length){while(soWaste.length){const c=soWaste.pop();c.up=false;soStock.push(c);}}else{soUndo.pop();}soSel=null;soRender();}
 function soSrc(){if(!soSel)return null;if(soSel.type==='waste')return soWaste.slice(-1);if(soSel.type==='tableau')return soTab[soSel.col].slice(soSel.idx);if(soSel.type==='foundation')return soFound[soSel.col].slice(-1);return null;}
 function soRemoveSrc(){if(soSel.type==='waste')soWaste.pop();else if(soSel.type==='tableau')soTab[soSel.col].splice(soSel.idx);else if(soSel.type==='foundation')soFound[soSel.col].pop();}
 function soFlip(col){const p=soTab[col];if(p.length&&!p[p.length-1].up)p[p.length-1].up=true;}
+function soCanFound(c){return c.r===soFound[c.s].length+1;}
 function soMoveTo(target){const cards=soSrc();if(!cards||!cards.length)return false;const srcCol=(soSel.type==='tableau')?soSel.col:-1;
-  if(target.type==='foundation'){if(cards.length!==1)return false;const c=cards[0];if(c.r!==soFound[c.s].length+1)return false;soSnap();soRemoveSrc();soFound[c.s].push(c);if(srcCol>=0)soFlip(srcCol);soSel=null;soRender();soWin();return true;}
-  if(target.type==='tableau'){const col=target.col;if(soSel.type==='tableau'&&soSel.col===col)return false;const first=cards[0],dest=soTab[col];const ok=dest.length===0?(first.r===13):(dest[dest.length-1].up&&dest[dest.length-1].r===first.r+1&&soRed(dest[dest.length-1].s)!==soRed(first.s));if(!ok)return false;soSnap();soRemoveSrc();dest.push(...cards);if(srcCol>=0)soFlip(srcCol);soSel=null;soRender();soWin();return true;}
+  if(target.type==='foundation'){if(cards.length!==1)return false;const c=cards[0];if(!soCanFound(c))return false;soSnap();soRemoveSrc();soFound[c.s].push(c);if(srcCol>=0)soFlip(srcCol);soSel=null;soBump();soRender();soWin();return true;}
+  if(target.type==='tableau'){const col=target.col;if(soSel.type==='tableau'&&soSel.col===col)return false;const first=cards[0],dest=soTab[col];const ok=dest.length===0?(first.r===13):(dest[dest.length-1].up&&dest[dest.length-1].r===first.r+1&&soRed(dest[dest.length-1].s)!==soRed(first.s));if(!ok)return false;soSnap();soRemoveSrc();dest.push(...cards);if(srcCol>=0)soFlip(srcCol);soSel=null;soBump();soRender();soWin();return true;}
   return false;}
-function soWin(){if(soFound.every(f=>f.length===13)){gs.solitaire.won++;save();gameWin('You won! \uD83C\uDF89','Solitaire cleared \u2014 baby <b>Eli</b> celebrates \uD83D\uDC99',()=>{gs.solitaire.played++;save();soDeal();});}}
+function soWin(){if(soFound.every(f=>f.length===13)){if(soTid){clearInterval(soTid);soTid=null;}gs.solitaire.won++;save();gameWin('You won! \uD83C\uDF89','Cleared in '+soMoves+' moves \u2014 baby <b>Eli</b> celebrates \uD83D\uDC99',()=>{gs.solitaire.played++;save();soDeal();});}}
 function soAuto(){soSnap();let moved=true,any=false;while(moved){moved=false;const tops=[];if(soWaste.length)tops.push(['waste',-1,soWaste[soWaste.length-1]]);for(let i=0;i<7;i++){const p=soTab[i];if(p.length&&p[p.length-1].up)tops.push(['tableau',i,p[p.length-1]]);}
-  for(const t of tops){const c=t[2];if(c.r===soFound[c.s].length+1){if(t[0]==='waste')soWaste.pop();else{soTab[t[1]].pop();soFlip(t[1]);}soFound[c.s].push(c);moved=true;any=true;break;}}}
-  if(!any)soUndo.pop();soSel=null;soRender();soWin();}
+  for(const t of tops){const c=t[2];if(soCanFound(c)){if(t[0]==='waste')soWaste.pop();else{soTab[t[1]].pop();soFlip(t[1]);}soFound[c.s].push(c);soMoves++;moved=true;any=true;break;}}}
+  if(!any){soUndo.pop();toast('Nothing to auto-move yet');}else soTimer();soSel=null;soRender();soWin();}
 function soCardEl(card,opts){const d=document.createElement('div');opts=opts||{};
   if(!card){d.className='slot-empty';d.textContent=opts.sym||'';return d;}
-  if(!card.up){d.className='pcard back';d.textContent='\u00A0';return d;}
-  d.className='pcard '+(soRed(card.s)?'red':'black')+(opts.sel?' sel':'');d.textContent=soLbl(card.r)+SUITS[card.s];return d;}
-function soRender(){
-  const stk=$('soStock');stk.innerHTML='';stk.onclick=soDraw;stk.appendChild(soStock.length?soCardEl({up:false}):soCardEl(null,{sym:'\u21BB'}));
-  const wst=$('soWaste');wst.innerHTML='';const wc=soWaste[soWaste.length-1];const we=wc?soCardEl(wc,{sel:soSel&&soSel.type==='waste'}):soCardEl(null);we.onclick=()=>{soSel=(soSel&&soSel.type==='waste')?null:{type:'waste'};soRender();};wst.appendChild(we);
-  for(let fi=0;fi<4;fi++){const fe=$('soF'+fi);fe.innerHTML='';const top=soFound[fi][soFound[fi].length-1];const el=top?soCardEl(top,{sel:soSel&&soSel.type==='foundation'&&soSel.col===fi}):soCardEl(null,{sym:SUITS[fi]});el.onclick=()=>{if(soSel){if(soMoveTo({type:'foundation'}))return;}soSel={type:'foundation',col:fi};soRender();};fe.appendChild(el);}
-  const cols=$('soCols');cols.innerHTML='';for(let c=0;c<7;c++){const col=document.createElement('div');col.className='so-col';const p=soTab[c];
+  if(!card.up){d.className='pcard back';if(opts.count!=null){d.textContent=opts.count;d.style.color='rgba(255,255,255,.92)';d.style.display='flex';d.style.alignItems='center';d.style.justifyContent='center';d.style.fontSize='1rem';}else d.textContent='\u00A0';return d;}
+  d.className='pcard '+(soRed(card.s)?'red':'black')+(opts.sel?' sel':'');d.innerHTML='<span class="pc-tl">'+soLbl(card.r)+SUITS[card.s]+'</span><span class="pc-br">'+SUITS[card.s]+'</span>';return d;}
+function soCardsOf(src){if(src.type==='waste')return soWaste.slice(-1);if(src.type==='tableau')return soTab[src.col].slice(src.idx);if(src.type==='foundation')return soFound[src.col].slice(-1);return null;}
+function soTap(src){
+  if(soSel&&src.type==='tableau'&&soSel.type==='tableau'&&soSel.col===src.col&&soSel.idx===src.idx){soSel=null;soRender();return;}
+  if(soSel&&src.type==='waste'&&soSel.type==='waste'){soSel=null;soRender();return;}
+  if(soSel){if(src.type==='tableau'){if(soMoveTo({type:'tableau',col:src.col}))return;}soSel=null;}
+  const cards=soCardsOf(src);if(cards&&cards.length===1&&soCanFound(cards[0])){soSel=src;soMoveTo({type:'foundation'});return;}
+  soSel=(src.type==='tableau')?{type:'tableau',col:src.col,idx:src.idx}:{type:'waste'};soRender();}
+function soComputeValid(src){soValid=new Set();const cards=soCardsOf(src);if(!cards||!cards.length)return;const first=cards[0];
+  if(cards.length===1&&soCanFound(first))soValid.add('foundation:'+first.s);
+  for(let j=0;j<7;j++){if(src.type==='tableau'&&src.col===j)continue;const d=soTab[j];const ok=d.length===0?(first.r===13):(d[d.length-1].up&&d[d.length-1].r===first.r+1&&soRed(d[d.length-1].s)!==soRed(first.s));if(ok)soValid.add('tableau:'+j);}}
+function soMarkValid(on){document.querySelectorAll('#scr-solitaire [data-pile]').forEach(el=>{const key=el.dataset.pile+':'+el.dataset.col;el.classList.toggle('so-valid',!!on&&soValid.has(key));if(!on)el.classList.remove('so-over');});}
+function soPileAt(x,y){let el=document.elementFromPoint(x,y);while(el&&!(el.dataset&&el.dataset.pile))el=el.parentElement;return el;}
+function soStartDrag(e,src){if(e.button!=null&&e.button>0)return;const cards=soCardsOf(src);if(!cards||!cards.length||!cards[0].up)return;soDrag={src,sx:e.clientX,sy:e.clientY,moved:false};}
+if(typeof window!=='undefined'&&window.PointerEvent){
+  document.addEventListener('pointermove',e=>{if(!soDrag)return;if(!soDrag.moved){if(Math.hypot(e.clientX-soDrag.sx,e.clientY-soDrag.sy)<8)return;soDrag.moved=true;soComputeValid(soDrag.src);soMarkValid(true);}
+    document.querySelectorAll('#scr-solitaire .so-over').forEach(x=>x.classList.remove('so-over'));const el=soPileAt(e.clientX,e.clientY);if(el){const key=el.dataset.pile+':'+el.dataset.col;if(soValid.has(key))el.classList.add('so-over');}e.preventDefault();},{passive:false});
+  document.addEventListener('pointerup',e=>{if(!soDrag)return;const d=soDrag;soDrag=null;soMarkValid(false);if(curScreen!=='solitaire')return;
+    if(!d.moved){soTap(d.src);return;}
+    const el=soPileAt(e.clientX,e.clientY);if(el){soSel=d.src;if(!soMoveTo({type:el.dataset.pile,col:+el.dataset.col})){soSel=null;soRender();}}else{soSel=null;soRender();}});
+}
+function soRender(){const PE=typeof window!=='undefined'&&window.PointerEvent;
+  const stk=$('soStock');stk.innerHTML='';stk.onclick=soDraw;stk.appendChild(soStock.length?soCardEl({up:false},{count:soStock.length}):soCardEl(null,{sym:'\u21BB'}));
+  const wst=$('soWaste');wst.innerHTML='';const wc=soWaste[soWaste.length-1];const we=wc?soCardEl(wc,{sel:soSel&&soSel.type==='waste'}):soCardEl(null);
+  if(wc){we.style.touchAction='none';we.addEventListener('pointerdown',ev=>soStartDrag(ev,{type:'waste'}));if(!PE)we.onclick=()=>soTap({type:'waste'});}
+  wst.appendChild(we);
+  for(let fi=0;fi<4;fi++){const fe=$('soF'+fi);fe.innerHTML='';fe.dataset.pile='foundation';fe.dataset.col=fi;const top=soFound[fi][soFound[fi].length-1];const el=top?soCardEl(top,{sel:soSel&&soSel.type==='foundation'&&soSel.col===fi}):soCardEl(null,{sym:SUITS[fi]});el.onclick=()=>{if(soSel){if(soMoveTo({type:'foundation'}))return;}soSel={type:'foundation',col:fi};soRender();};fe.appendChild(el);}
+  const cols=$('soCols');cols.innerHTML='';for(let c=0;c<7;c++){const col=document.createElement('div');col.className='so-col';col.dataset.pile='tableau';col.dataset.col=c;const p=soTab[c];
     if(!p.length){const e=soCardEl(null);e.onclick=()=>{if(soSel)soMoveTo({type:'tableau',col:c});};col.appendChild(e);}
     else p.forEach((card,idx)=>{const el=soCardEl(card,{sel:soSel&&soSel.type==='tableau'&&soSel.col===c&&idx>=soSel.idx});
-      el.onclick=()=>{if(!card.up)return;if(soSel){if(soMoveTo({type:'tableau',col:c}))return;soSel={type:'tableau',col:c,idx};soRender();}else{soSel={type:'tableau',col:c,idx};soRender();}};col.appendChild(el);});
+      if(card.up){el.style.touchAction='none';el.addEventListener('pointerdown',ev=>soStartDrag(ev,{type:'tableau',col:c,idx}));if(!PE)el.onclick=()=>soTap({type:'tableau',col:c,idx});}
+      col.appendChild(el);});
     cols.appendChild(col);}
-  $('soSub').textContent='Foundations: '+soFound.reduce((a,f)=>a+f.length,0)+'/52';}
-function soHint(){const tops=[];if(soWaste.length)tops.push(soWaste[soWaste.length-1]);for(let i=0;i<7;i++){const p=soTab[i];if(p.length&&p[p.length-1].up)tops.push(p[p.length-1]);}
-  for(const c of tops)if(c.r===soFound[c.s].length+1){toast('Send '+soLbl(c.r)+SUITS[c.s]+' to a foundation');return;}
-  for(const c of tops)for(let j=0;j<7;j++){const d=soTab[j];if(d.length){const t=d[d.length-1];if(t.up&&t.r===c.r+1&&soRed(t.s)!==soRed(c.s)){toast('Move '+soLbl(c.r)+SUITS[c.s]+' onto '+soLbl(t.r)+SUITS[t.s]);return;}}else if(c.r===13){toast('Move '+soLbl(c.r)+SUITS[c.s]+' to the empty column');return;}}
+  soInfo();}
+function soFlash(sel){const el=document.querySelector(sel);if(!el)return;el.classList.add('so-over');setTimeout(()=>{el.classList.remove('so-over');},1300);}
+function soHint(){const srcs=[];if(soWaste.length)srcs.push({c:soWaste[soWaste.length-1],sel:'#soWaste'});for(let i=0;i<7;i++){const p=soTab[i];if(p.length&&p[p.length-1].up)srcs.push({c:p[p.length-1],sel:'#scr-solitaire .so-col[data-col="'+i+'"]'});}
+  for(const s of srcs)if(soCanFound(s.c)){toast('Send '+soLbl(s.c.r)+SUITS[s.c.s]+' to a foundation');soFlash(s.sel);return;}
+  for(const s of srcs)for(let j=0;j<7;j++){const d=soTab[j];if(d.length){const t=d[d.length-1];if(t.up&&t.r===s.c.r+1&&soRed(t.s)!==soRed(s.c.s)){toast('Move '+soLbl(s.c.r)+SUITS[s.c.s]+' onto '+soLbl(t.r)+SUITS[t.s]);soFlash(s.sel);return;}}else if(s.c.r===13){toast('Move '+soLbl(s.c.r)+SUITS[s.c.s]+' to the empty column');soFlash(s.sel);return;}}
   toast((soStock.length||soWaste.length)?'Draw from the stock':'No moves \u2014 undo or start a new game');}
 $('soNew').onclick=()=>{gs.solitaire.played++;save();soDeal();};
 $('soUndoB').onclick=()=>soUndoMove();
 $('soAutoB').onclick=()=>soAuto();
+$('soBack').onclick=()=>show('home');
+$('soHintB').onclick=()=>soHint();
+$('soDrawTog').onclick=()=>{soDraw3=!soDraw3;$('soDrawTog').textContent=soDraw3?'Draw 3':'Draw 1';};
 
-const HINT={wordle:wDoHint,honey:hyHint,ladder:ldHint,boggle:bgHint,anagram:anHint,search:seHint,hangman:hmHint,connect:cnHint,cross:cwHint,sudoku:suHint,solitaire:soHint};
+/* ===================== MEMORY (Pairs) ===================== */
+let meCards=[],meFlip=[],meBusy=false,meMoves=0,meMatched=0,meDiff='easy',meUId=false;
+const MESYM=['\uD83D\uDC36','\uD83D\uDC31','\uD83D\uDC2D','\uD83D\uDC30','\uD83E\uDD8A','\uD83D\uDC3B','\uD83D\uDC3C','\uD83D\uDC28','\uD83D\uDC2F','\uD83E\uDD81','\uD83D\uDC2E','\uD83D\uDC37','\uD83D\uDC38','\uD83D\uDC35','\uD83E\uDD84','\uD83D\uDC14','\uD83E\uDD89','\uD83E\uDD8B','\uD83D\uDC22','\uD83D\uDC19','\uD83E\uDD80','\uD83D\uDC20','\uD83D\uDC33','\uD83E\uDD93','\uD83C\uDF4E','\uD83C\uDF4C','\uD83C\uDF47','\uD83C\uDF53','\uD83C\uDF52','\uD83C\uDF4D'];
+const MEGRID={easy:[3,4],medium:[4,4],hard:[5,4]};
+function meBuildUI(){if(meUId)return;meUId=true;const bar=$('meBar');[['easy','Easy'],['medium','Medium'],['hard','Hard']].forEach(([d,l])=>{const b=document.createElement('button');b.className='seg';b.dataset.d=d;b.textContent=l;b.onclick=()=>{meDiff=d;meStart();};bar.appendChild(b);});const nb=document.createElement('button');nb.className='minibtn';nb.textContent='New';nb.onclick=()=>meStart();bar.appendChild(nb);}
+function initMemory(){meBuildUI();meStart();}
+function meStart(){const[rows,cols]=MEGRID[meDiff];const pairs=rows*cols/2;const syms=shuffleArr(MESYM.slice()).slice(0,pairs);const arr=[];syms.forEach((s,i)=>{arr.push({s,id:i,up:false,done:false});arr.push({s,id:i,up:false,done:false});});shuffleArr(arr);meCards=arr;meFlip=[];meBusy=false;meMoves=0;meMatched=0;
+  document.querySelectorAll('#meBar .seg').forEach(b=>b.classList.toggle('active',b.dataset.d===meDiff));noKb();meRender();meStat();}
+function meRender(){const[rows,cols]=MEGRID[meDiff];const bd=$('meBoard');const side=Math.min(window.innerWidth*0.92,window.innerHeight*0.56,440);bd.style.width=side+'px';bd.style.height=(side*rows/cols)+'px';bd.style.gridTemplateColumns='repeat('+cols+',1fr)';bd.style.gridTemplateRows='repeat('+rows+',1fr)';bd.innerHTML='';
+  meCards.forEach((c,i)=>{const t=document.createElement('div');t.className='mecard'+(c.done?' done':(c.up?' up':''));t.textContent=(c.up||c.done)?c.s:'';t.onclick=()=>meTap(i);bd.appendChild(t);});}
+function meStat(){$('meSub').textContent='Moves: '+meMoves+' \u00b7 pairs '+meMatched+'/'+(meCards.length/2);}
+function meTap(i){if(meBusy)return;const c=meCards[i];if(c.up||c.done)return;c.up=true;meFlip.push(i);meRender();
+  if(meFlip.length===2){meMoves++;meStat();const[a,b]=meFlip;if(meCards[a].s===meCards[b].s){meCards[a].done=meCards[b].done=true;meFlip=[];meMatched++;meRender();meStat();if(meMatched===meCards.length/2)meWin();}
+    else{meBusy=true;setTimeout(()=>{meCards[a].up=meCards[b].up=false;meFlip=[];meBusy=false;meRender();},850);}}}
+function meWin(){gs.memory.won++;if(!gs.memory.best||meMoves<gs.memory.best)gs.memory.best=meMoves;save();setTimeout(()=>gameWin('Matched! \uD83C\uDF89','All pairs in '+meMoves+' moves \u2014 baby <b>Eli</b> claps \uD83D\uDC99',()=>meStart()),420);}
+function meHint(){if(meBusy||meFlip.length)return;const groups={};meCards.forEach((c,i)=>{if(!c.done)(groups[c.s]=groups[c.s]||[]).push(i);});const pair=Object.keys(groups).map(k=>groups[k]).find(g=>g.length===2);if(!pair)return;pair.forEach(i=>meCards[i].up=true);meRender();setTimeout(()=>{pair.forEach(i=>{if(!meCards[i].done)meCards[i].up=false;});meRender();},900);}
+
+const HINT={wordle:wDoHint,honey:hyHint,ladder:ldHint,boggle:bgHint,anagram:anHint,search:seHint,hangman:hmHint,connect:cnHint,cross:cwHint,sudoku:suHint,solitaire:soHint,memory:meHint};
 function hyHint(){const left=[...hyValid].filter(w=>!hyFound.includes(w)).sort((a,b)=>a.length-b.length);if(!left.length){toast('All found!');return;}const w=left[0];toast('Try: '+w.slice(0,2).toUpperCase()+'\u2026 ('+w.length+')');}
 
 /* go */
+window.addEventListener('resize',applySoOrient);
+window.addEventListener('orientationchange',applySoOrient);
 show('home');
 if(!store.seen){const i=INSTR.home;$('helpTitle').textContent=i.t;$('helpBody').innerHTML=i.b;$('helpModal').classList.add('show');store.seen=1;save();}
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
