@@ -120,6 +120,31 @@
   .smetrics{display:flex;gap:16px;flex-wrap:wrap;}
   .smetrics div{font-size:.74rem;color:var(--muted);}
   .smetrics b{display:block;font-size:1.25rem;color:var(--ink);font-weight:800;}
+  /* sudoku */
+  #suBar{flex-wrap:wrap;}
+  .grid.sudoku{width:min(94vw,430px);height:min(94vw,430px);grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);gap:0;border:2px solid var(--ink);background:var(--panel);}
+  .su{display:flex;align-items:center;justify-content:center;font-size:min(5.2vw,1.4rem);font-weight:700;color:var(--accent);cursor:pointer;border:.5px solid var(--line);background:var(--panel);}
+  .su.given{color:var(--ink);font-weight:800;}
+  .su.sel{background:rgba(47,158,110,.16);}
+  .su.bad{color:#d9362b;}
+  .su.b-r{border-right:2px solid var(--ink);}
+  .su.b-b{border-bottom:2px solid var(--ink);}
+  .supad{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:430px;margin-top:4px;}
+  .supad button{width:40px;height:46px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.15rem;font-weight:800;cursor:pointer;}
+  /* solitaire */
+  .so-wrap{padding:8px;overflow:auto;height:100%;}
+  .so-top{display:flex;gap:4px;align-items:flex-start;margin-bottom:14px;}
+  .so-spacer{flex:1 1 auto;min-width:4px;}
+  .card-slot{width:44px;height:62px;flex:0 0 auto;}
+  .so-cols{display:flex;gap:4px;align-items:flex-start;}
+  .so-col{flex:1 1 0;display:flex;flex-direction:column;min-height:62px;min-width:0;}
+  .pcard{height:62px;border-radius:5px;border:1px solid #c9ced4;background:#fff;font-weight:800;font-size:.8rem;padding:3px 4px;box-sizing:border-box;overflow:hidden;line-height:1;cursor:pointer;}
+  .card-slot .pcard{width:100%;}
+  .so-col .pcard+.pcard{margin-top:-44px;}
+  .pcard.red{color:#d9362b;}.pcard.black{color:#1b1f24;}
+  .pcard.back{background:repeating-linear-gradient(45deg,#3a72ad,#3a72ad 5px,#5390cf 5px,#5390cf 10px);border-color:#3a72ad;color:transparent;}
+  .pcard.sel{outline:3px solid var(--accent);outline-offset:-2px;}
+  .slot-empty{width:100%;height:62px;border-radius:5px;border:1px dashed var(--line);background:rgba(0,0,0,.03);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.1rem;cursor:pointer;}
   @media (prefers-reduced-motion: reduce){#confetti{display:none!important;}.shake{animation:none!important;}}
 </style>
 </head>
@@ -196,6 +221,30 @@
         <div class="clues" id="cwClues"></div></main>
     </div>
 
+    <div class="screen" id="scr-sudoku">
+      <div class="barrow" id="suBar"></div>
+      <main class="play"><div class="sub" id="suSub"></div>
+        <div class="grid sudoku" id="suBoard"></div>
+        <div class="supad" id="suPad"></div></main>
+    </div>
+
+    <div class="screen" id="scr-solitaire">
+      <div class="so-wrap">
+        <div class="sub" id="soSub" style="margin-bottom:8px"></div>
+        <div class="so-top">
+          <div class="card-slot" id="soStock"></div>
+          <div class="card-slot" id="soWaste"></div>
+          <div class="so-spacer"></div>
+          <div class="card-slot" id="soF0"></div>
+          <div class="card-slot" id="soF1"></div>
+          <div class="card-slot" id="soF2"></div>
+          <div class="card-slot" id="soF3"></div>
+        </div>
+        <div class="so-cols" id="soCols"></div>
+        <div class="barrow" style="margin-top:12px;max-width:430px"><button class="minibtn" id="soNew" style="flex:1">New</button><button class="minibtn" id="soUndoB" style="flex:1">Undo</button><button class="seg active" id="soAutoB" style="flex:1.2">Auto</button></div>
+      </div>
+    </div>
+
   </div>
 
   <div id="kbWrap"></div>
@@ -256,7 +305,7 @@ store.stats=Object.assign({played:0,wins:0,cur:0,max:0,dist:[0,0,0,0,0],lastWonD
 if(!Array.isArray(store.stats.dist)||store.stats.dist.length!==5)store.stats.dist=[0,0,0,0,0];
 store.daily=Object.assign({day:null,guesses:[],done:false,won:false},store.daily||{});
 store.practice=Object.assign({len:5,levels:{}},store.practice||{});
-store.gs=Object.assign({honey:{score:0,words:0},ladder:{solved:0,best:0},boggle:{score:0,words:0,plays:0},anagram:{best:0},search:{done:0},hangman:{w:0,l:0,streak:0,best:0},connect:{solved:0,plays:0},cross:{solved:0}},store.gs||{});
+store.gs=Object.assign({honey:{score:0,words:0},ladder:{solved:0,best:0},boggle:{score:0,words:0,plays:0},anagram:{best:0},search:{done:0},hangman:{w:0,l:0,streak:0,best:0},connect:{solved:0,plays:0},cross:{solved:0},sudoku:{solved:0},solitaire:{won:0,played:0}},store.gs||{});
 if(store.winCount==null)store.winCount=0;
 const save=()=>STORE.set(store);
 const gs=store.gs;
@@ -286,8 +335,8 @@ document.addEventListener('keydown',e=>{if(document.querySelector('.overlay.show
 
 /* router */
 let curScreen='home';
-const TITLES={home:"Eli's Games",stats:"Stats",wordle:"Wordle",honey:"Spelling Bee",ladder:"Word Ladder",boggle:"Boggle",anagram:"Anagram",search:"Word Search",hangman:"Hangman",connect:"Connections",cross:"Crossword"};
-const INIT={stats:renderStats,wordle:initWordle,honey:initHoney,ladder:initLadder,boggle:initBoggle,anagram:initAnagram,search:initSearch,hangman:initHangman,connect:initConnect,cross:initCross};
+const TITLES={home:"Eli's Games",stats:"Stats",wordle:"Wordle",honey:"Spelling Bee",ladder:"Word Ladder",boggle:"Boggle",anagram:"Anagram",search:"Word Search",hangman:"Hangman",connect:"Connections",cross:"Crossword",sudoku:"Sudoku",solitaire:"Solitaire"};
+const INIT={stats:renderStats,wordle:initWordle,honey:initHoney,ladder:initLadder,boggle:initBoggle,anagram:initAnagram,search:initSearch,hangman:initHangman,connect:initConnect,cross:initCross,sudoku:initSudoku,solitaire:initSolitaire};
 function show(id){curScreen=id;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$('scr-'+id).classList.add('on');
   $('backBtn').style.visibility=id==='home'?'hidden':'visible';
   $('statsBtn').style.display=id==='home'?'':'none';
@@ -308,7 +357,9 @@ const GAMES=[["wordle","\uD83D\uDFE9","Wordle","Daily 5-letter + practice 3\u201
  ["search","\uD83D\uDD0D","Word Search","Find the hidden words"],
  ["hangman","\uD83C\uDFAF","Hangman","Guess the word"],
  ["connect","\uD83E\uDDE9","Connections","Group 16 into 4"],
- ["cross","\u270F\uFE0F","Crossword","Fill the mini grid"]];
+ ["cross","\u270F\uFE0F","Crossword","Fill the mini grid"],
+ ["sudoku","\uD83D\uDD22","Sudoku","Fill 1\u20139, no repeats"],
+ ["solitaire","\uD83C\uDCCF","Solitaire","Classic Klondike patience"]];
 (function(){const c=$('cards');GAMES.forEach(g=>{const d=document.createElement('button');d.className='card';
   d.innerHTML='<div class="emoji">'+g[1]+'</div><h3>'+g[2]+'</h3><p>'+g[3]+'</p>';d.onclick=()=>show(g[0]);c.appendChild(d);});})();
 
@@ -323,6 +374,8 @@ const INSTR={
  hangman:{t:"Hangman",b:"Guess the hidden word one letter at a time using the keyboard. You can make <b>6 wrong guesses</b> before it's game over. \uD83D\uDCA1 reveals a letter."},
  connect:{t:"Connections",b:"Sort the 16 words into <b>4 hidden groups of 4</b>. Select four words then <b>Submit</b>. Four wrong guesses and the game ends. \uD83D\uDCA1 names one group."},
  cross:{t:"Crossword",b:"Fill every square so that each <b>row and column</b> spells a word. Tap a square and type a letter; use the Across and Down clues. <b>Check</b> marks wrong letters grey. \uD83D\uDCA1 fills the selected square."},
+ sudoku:{t:"Sudoku",b:"Fill the grid so every <b>row, column and 3\u00d73 box</b> contains 1\u20139 with no repeats. Tap a square, then a number (or \u2326 to clear). Pick <b>Easy / Medium / Hard</b>, and \uD83D\uDCA1 fills the selected square."},
+ solitaire:{t:"Solitaire",b:"Klondike patience. Build the four <b>foundations up by suit</b> from Ace to King. On the table, stack <b>down in alternating colours</b>; only Kings start an empty column. <br><br>Tap a card to pick it up, then tap where to place it. Tap the deck to draw. <b>Auto</b> sends every available card to the foundations, and <b>Undo</b> takes back a move."},
  stats:{t:"Stats",b:"Your scores across all nine games, saved on this device."}
 };
 
@@ -339,7 +392,9 @@ function renderStats(){const s=store.stats,g=gs;const wpct=s.played?Math.round(s
    card('\uD83D\uDD0D','Word Search',[['Completed',g.search.done]])+
    card('\uD83C\uDFAF','Hangman',[['Wins',g.hangman.w],['Win %',hmpct],['Streak',g.hangman.streak],['Best',g.hangman.best]])+
    card('\uD83E\uDDE9','Connections',[['Solved',g.connect.solved],['Played',g.connect.plays]])+
-   card('\u270F\uFE0F','Crossword',[['Solved',g.cross.solved]]);
+   card('\u270F\uFE0F','Crossword',[['Solved',g.cross.solved]])+
+   card('\uD83D\uDD22','Sudoku',[['Solved',g.sudoku.solved]])+
+   card('\uD83C\uDCCF','Solitaire',[['Won',g.solitaire.won],['Played',g.solitaire.played],['Win %',g.solitaire.played?Math.round(g.solitaire.won/g.solitaire.played*100):0]]);
 }
 
 function gridSide(){return Math.floor(Math.min(window.innerWidth*0.9,window.innerHeight*0.5,460));}
@@ -567,7 +622,73 @@ function cwCheck(){let ok=true;for(let r=0;r<5;r++)for(let c=0;c<5;c++){if(cwCel
 $('cwNew').onclick=()=>{store.cwN=(store.cwN||0)+1;initCross();};
 function cwHint(){const r=(cwSel/5)|0,c=cwSel%5;cwCells[cwSel]=cwP.r[r][c];if(cwSel<24)cwSel++;drawCross();toast('Filled '+cwP.r[r][c].toUpperCase());}
 
-const HINT={wordle:wDoHint,honey:hyHint,ladder:ldHint,boggle:bgHint,anagram:anHint,search:seHint,hangman:hmHint,connect:cnHint,cross:cwHint};
+/* ===================== SUDOKU ===================== */
+let suSol=[],suGiven=[],suCells=[],suSel=-1,suDiff='easy',suDone=false,suUId=false;
+function suOk(a,p,v){const r=(p/9|0),c=p%9;for(let i=0;i<9;i++){if(a[r*9+i]===v||a[i*9+c]===v)return false;}const br=r-r%3,bc=c-c%3;for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(a[(br+i)*9+bc+j]===v)return false;return true;}
+function suFull(){const g=Array(81).fill(0);(function fill(p){if(p===81)return true;const ns=shuffleArr([1,2,3,4,5,6,7,8,9]);for(const v of ns){if(suOk(g,p,v)){g[p]=v;if(fill(p+1))return true;g[p]=0;}}return false;})(0);return g;}
+function suCount(a){let cnt=0;const g=a.slice();function find(){let best=-1,bc=10;for(let p=0;p<81;p++)if(g[p]===0){let c=0;for(let v=1;v<=9;v++)if(suOk(g,p,v))c++;if(c<bc){bc=c;best=p;if(c<=1)return best;}}return best;}(function sol(){const p=find();if(p<0){cnt++;return cnt>=2;}for(let v=1;v<=9;v++){if(suOk(g,p,v)){g[p]=v;if(sol()){g[p]=0;return true;}g[p]=0;}}return false;})();return cnt;}
+function suGen(diff){const sol=suFull();const givens={easy:42,medium:34,hard:28}[diff]||38;const puzzle=sol.slice();let filled=81;const order=shuffleArr([...Array(81).keys()]);
+  for(const p of order){if(filled<=givens)break;const bak=puzzle[p];puzzle[p]=0;if(suCount(puzzle)!==1)puzzle[p]=bak;else filled--;}
+  return{sol,puzzle};}
+function suBuildUI(){if(suUId)return;suUId=true;const bar=$('suBar');['easy','medium','hard'].forEach(d=>{const b=document.createElement('button');b.className='seg';b.dataset.d=d;b.textContent=d[0].toUpperCase()+d.slice(1);b.onclick=()=>{suDiff=d;suStart();};bar.appendChild(b);});const nb=document.createElement('button');nb.className='minibtn';nb.textContent='New';nb.onclick=()=>suStart();bar.appendChild(nb);
+  const pad=$('suPad');for(let v=1;v<=9;v++){const b=document.createElement('button');b.textContent=v;b.onclick=()=>suPlace(v);pad.appendChild(b);}const e=document.createElement('button');e.textContent='\u2326';e.onclick=()=>suPlace(0);pad.appendChild(e);}
+function initSudoku(){suBuildUI();if(!suSol.length)suStart();else{noKb();suRender();}}
+function suStart(){const{sol,puzzle}=suGen(suDiff);suSol=sol;suCells=puzzle.slice();suGiven=puzzle.map(v=>v!==0);suSel=-1;suDone=false;
+  document.querySelectorAll('#suBar .seg').forEach(b=>b.classList.toggle('active',b.dataset.d===suDiff));
+  $('suSub').textContent='Fill 1\u20139 \u2014 no repeats in a row, column or box.';noKb();suRender();}
+function suConflicts(){const bad=new Set();for(let p=0;p<81;p++){const v=suCells[p];if(!v)continue;const r=(p/9|0),c=p%9;for(let i=0;i<9;i++){const a=r*9+i,b=i*9+c;if(a!==p&&suCells[a]===v)bad.add(p);if(b!==p&&suCells[b]===v)bad.add(p);}const br=r-r%3,bc=c-c%3;for(let i=0;i<3;i++)for(let j=0;j<3;j++){const q=(br+i)*9+bc+j;if(q!==p&&suCells[q]===v)bad.add(p);}}return bad;}
+function suRender(){const bd=$('suBoard');bd.innerHTML='';const bad=suConflicts();for(let p=0;p<81;p++){const r=(p/9|0),c=p%9;const t=document.createElement('div');t.className='su'+(suGiven[p]?' given':'')+(p===suSel?' sel':'')+(bad.has(p)?' bad':'')+(c%3===2&&c<8?' b-r':'')+(r%3===2&&r<8?' b-b':'');t.textContent=suCells[p]||'';t.onclick=()=>{suSel=p;suRender();};bd.appendChild(t);}}
+function suSolved(){return suCells.every((x,i)=>x===suSol[i]);}
+function suPlace(v){if(suDone||suSel<0||suGiven[suSel])return;suCells[suSel]=v;suRender();if(suSolved()){suDone=true;gs.sudoku.solved++;save();gameWin('Solved! \uD83C\uDF89','Sudoku complete \u2014 baby <b>Eli</b> is amazed \uD83D\uDC99',()=>suStart());}}
+function suHint(){if(suDone)return;let p=(suSel>=0&&!suGiven[suSel]&&!suCells[suSel])?suSel:-1;if(p<0){const e=[];for(let i=0;i<81;i++)if(!suCells[i])e.push(i);if(!e.length)return;p=e[rint(e.length)];}suSel=p;suCells[p]=suSol[p];suRender();toast('Filled '+suSol[p]);if(suSolved()){suDone=true;gs.sudoku.solved++;save();gameWin('Solved! \uD83C\uDF89','Sudoku complete \u2014 baby <b>Eli</b> \uD83D\uDC99',()=>suStart());}}
+
+/* ===================== SOLITAIRE (Klondike) ===================== */
+const SUITS=['\u2663','\u2666','\u2665','\u2660'];
+let soStock=[],soWaste=[],soFound=[[],[],[],[]],soTab=[[],[],[],[],[],[],[]],soSel=null,soUndo=[];
+function soRed(s){return s===1||s===2;}
+function soLbl(r){return r===1?'A':r===11?'J':r===12?'Q':r===13?'K':''+r;}
+function initSolitaire(){const inProg=soTab.some(p=>p.length)||soFound.some(f=>f.length)||soStock.length||soWaste.length;if(inProg){noKb();soRender();}else{gs.solitaire.played++;save();soDeal();}}
+function soDeal(){const deck=[];for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({s,r,up:false});shuffleArr(deck);
+  soFound=[[],[],[],[]];soTab=[[],[],[],[],[],[],[]];soWaste=[];soUndo=[];soSel=null;let k=0;
+  for(let c=0;c<7;c++)for(let i=0;i<=c;i++){const card=deck[k++];card.up=(i===c);soTab[c].push(card);}
+  soStock=deck.slice(k);soStock.forEach(c=>c.up=false);noKb();soRender();}
+function soSnap(){soUndo.push(JSON.stringify({a:soStock,b:soWaste,f:soFound,t:soTab}));if(soUndo.length>300)soUndo.shift();}
+function soUndoMove(){if(!soUndo.length){toast('Nothing to undo');return;}const st=JSON.parse(soUndo.pop());soStock=st.a;soWaste=st.b;soFound=st.f;soTab=st.t;soSel=null;soRender();}
+function soDraw(){soSnap();if(soStock.length){const c=soStock.pop();c.up=true;soWaste.push(c);}else{while(soWaste.length){const c=soWaste.pop();c.up=false;soStock.push(c);}}soSel=null;soRender();}
+function soSrc(){if(!soSel)return null;if(soSel.type==='waste')return soWaste.slice(-1);if(soSel.type==='tableau')return soTab[soSel.col].slice(soSel.idx);if(soSel.type==='foundation')return soFound[soSel.col].slice(-1);return null;}
+function soRemoveSrc(){if(soSel.type==='waste')soWaste.pop();else if(soSel.type==='tableau')soTab[soSel.col].splice(soSel.idx);else if(soSel.type==='foundation')soFound[soSel.col].pop();}
+function soFlip(col){const p=soTab[col];if(p.length&&!p[p.length-1].up)p[p.length-1].up=true;}
+function soMoveTo(target){const cards=soSrc();if(!cards||!cards.length)return false;const srcCol=(soSel.type==='tableau')?soSel.col:-1;
+  if(target.type==='foundation'){if(cards.length!==1)return false;const c=cards[0];if(c.r!==soFound[c.s].length+1)return false;soSnap();soRemoveSrc();soFound[c.s].push(c);if(srcCol>=0)soFlip(srcCol);soSel=null;soRender();soWin();return true;}
+  if(target.type==='tableau'){const col=target.col;if(soSel.type==='tableau'&&soSel.col===col)return false;const first=cards[0],dest=soTab[col];const ok=dest.length===0?(first.r===13):(dest[dest.length-1].up&&dest[dest.length-1].r===first.r+1&&soRed(dest[dest.length-1].s)!==soRed(first.s));if(!ok)return false;soSnap();soRemoveSrc();dest.push(...cards);if(srcCol>=0)soFlip(srcCol);soSel=null;soRender();soWin();return true;}
+  return false;}
+function soWin(){if(soFound.every(f=>f.length===13)){gs.solitaire.won++;save();gameWin('You won! \uD83C\uDF89','Solitaire cleared \u2014 baby <b>Eli</b> celebrates \uD83D\uDC99',()=>{gs.solitaire.played++;save();soDeal();});}}
+function soAuto(){soSnap();let moved=true,any=false;while(moved){moved=false;const tops=[];if(soWaste.length)tops.push(['waste',-1,soWaste[soWaste.length-1]]);for(let i=0;i<7;i++){const p=soTab[i];if(p.length&&p[p.length-1].up)tops.push(['tableau',i,p[p.length-1]]);}
+  for(const t of tops){const c=t[2];if(c.r===soFound[c.s].length+1){if(t[0]==='waste')soWaste.pop();else{soTab[t[1]].pop();soFlip(t[1]);}soFound[c.s].push(c);moved=true;any=true;break;}}}
+  if(!any)soUndo.pop();soSel=null;soRender();soWin();}
+function soCardEl(card,opts){const d=document.createElement('div');opts=opts||{};
+  if(!card){d.className='slot-empty';d.textContent=opts.sym||'';return d;}
+  if(!card.up){d.className='pcard back';d.textContent='\u00A0';return d;}
+  d.className='pcard '+(soRed(card.s)?'red':'black')+(opts.sel?' sel':'');d.textContent=soLbl(card.r)+SUITS[card.s];return d;}
+function soRender(){
+  const stk=$('soStock');stk.innerHTML='';stk.onclick=soDraw;stk.appendChild(soStock.length?soCardEl({up:false}):soCardEl(null,{sym:'\u21BB'}));
+  const wst=$('soWaste');wst.innerHTML='';const wc=soWaste[soWaste.length-1];const we=wc?soCardEl(wc,{sel:soSel&&soSel.type==='waste'}):soCardEl(null);we.onclick=()=>{soSel=(soSel&&soSel.type==='waste')?null:{type:'waste'};soRender();};wst.appendChild(we);
+  for(let fi=0;fi<4;fi++){const fe=$('soF'+fi);fe.innerHTML='';const top=soFound[fi][soFound[fi].length-1];const el=top?soCardEl(top,{sel:soSel&&soSel.type==='foundation'&&soSel.col===fi}):soCardEl(null,{sym:SUITS[fi]});el.onclick=()=>{if(soSel){if(soMoveTo({type:'foundation'}))return;}soSel={type:'foundation',col:fi};soRender();};fe.appendChild(el);}
+  const cols=$('soCols');cols.innerHTML='';for(let c=0;c<7;c++){const col=document.createElement('div');col.className='so-col';const p=soTab[c];
+    if(!p.length){const e=soCardEl(null);e.onclick=()=>{if(soSel)soMoveTo({type:'tableau',col:c});};col.appendChild(e);}
+    else p.forEach((card,idx)=>{const el=soCardEl(card,{sel:soSel&&soSel.type==='tableau'&&soSel.col===c&&idx>=soSel.idx});
+      el.onclick=()=>{if(!card.up)return;if(soSel){if(soMoveTo({type:'tableau',col:c}))return;soSel={type:'tableau',col:c,idx};soRender();}else{soSel={type:'tableau',col:c,idx};soRender();}};col.appendChild(el);});
+    cols.appendChild(col);}
+  $('soSub').textContent='Foundations: '+soFound.reduce((a,f)=>a+f.length,0)+'/52';}
+function soHint(){const tops=[];if(soWaste.length)tops.push(soWaste[soWaste.length-1]);for(let i=0;i<7;i++){const p=soTab[i];if(p.length&&p[p.length-1].up)tops.push(p[p.length-1]);}
+  for(const c of tops)if(c.r===soFound[c.s].length+1){toast('Send '+soLbl(c.r)+SUITS[c.s]+' to a foundation');return;}
+  for(const c of tops)for(let j=0;j<7;j++){const d=soTab[j];if(d.length){const t=d[d.length-1];if(t.up&&t.r===c.r+1&&soRed(t.s)!==soRed(c.s)){toast('Move '+soLbl(c.r)+SUITS[c.s]+' onto '+soLbl(t.r)+SUITS[t.s]);return;}}else if(c.r===13){toast('Move '+soLbl(c.r)+SUITS[c.s]+' to the empty column');return;}}
+  toast((soStock.length||soWaste.length)?'Draw from the stock':'No moves \u2014 undo or start a new game');}
+$('soNew').onclick=()=>{gs.solitaire.played++;save();soDeal();};
+$('soUndoB').onclick=()=>soUndoMove();
+$('soAutoB').onclick=()=>soAuto();
+
+const HINT={wordle:wDoHint,honey:hyHint,ladder:ldHint,boggle:bgHint,anagram:anHint,search:seHint,hangman:hmHint,connect:cnHint,cross:cwHint,sudoku:suHint,solitaire:soHint};
 function hyHint(){const left=[...hyValid].filter(w=>!hyFound.includes(w)).sort((a,b)=>a.length-b.length);if(!left.length){toast('All found!');return;}const w=left[0];toast('Try: '+w.slice(0,2).toUpperCase()+'\u2026 ('+w.length+')');}
 
 /* go */
